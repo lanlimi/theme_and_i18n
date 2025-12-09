@@ -1,13 +1,17 @@
-import { createStyles } from 'antd-style'
+import { customCreateStyles } from '@/utils/customCreateStyles';
 
-export default createStyles({
-    root: {
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
+export default customCreateStyles(({ token, css }) => {
+  return {
+    root: css`
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: skyblue;
+  `,
+  }
 })
 
 

@@ -8,7 +8,7 @@ export default defineConfig({
   // 配置服务端口
   server: {
     port: 8069, // 端口号
-    host: true, // 热更新
+    host: true, // 允许外部访问
   },
   build: {
     outDir: 'dist',
