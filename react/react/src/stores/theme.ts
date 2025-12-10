@@ -2,12 +2,21 @@ import ColorLightToken from '@/assets/customToken/Color.Light.token.json'
 import ColorDarkToken from '@/assets/customToken/Color.Dark.token.json'
 import Size1920Token from '@/assets/customToken/Size.1920.token.json'
 import Size1336Token from '@/assets/customToken/Size.1336.token.json'
+import textStylesToken from '@/assets/customToken/text.styles.token.json'
 import { checkIsMobile } from '@/utils/equipment';
+import { makeAutoObservable } from 'mobx';
 
 
 class ThemeStore {
     theme: 'light' | 'dark' = 'light';
     size: number = 1920;
+
+    // mobx6.0后必须加上这一句，
+    // MobX 6.0 引入了 架构性变化 ，装饰器（如 @observable 、 @action ）不再自动使类成员响应式
+    // ，而是需要显式调用 makeObservable(this) 或 makeAutoObservable(this) 来完成响应式转换
+    constructor() {
+        makeAutoObservable(this);
+    }
 
     setTheme(theme: 'light' | 'dark') {
         this.theme = theme;
@@ -32,6 +41,10 @@ class ThemeStore {
             return Size1336Token;
         }
         return this.size <= 1336 ? Size1336Token : Size1920Token;
+    }
+
+    get textStylesToken() {
+        return textStylesToken
     }
 
 }
