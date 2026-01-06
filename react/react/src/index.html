@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Schedule Manager</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 统一的 Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6', // 蓝色主题
+                        secondary: '#6366F1', // 紫色
+                        success: '#10B981', // 绿色 - 工作
+                        warning: '#F59E0B', // 橙色 - 生活
+                        danger: '#EF4444', // 红色 - 娱乐
+                        info: '#06B6D4', // 青色 - 自定义
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .calendar-grid {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                gap: 1px;
+            }
+            .week-grid {
+                display: grid;
+                grid-template-columns: 80px repeat(7, 1fr);
+                gap: 1px;
+            }
+            .time-slot {
+                height: 60px;
+            }
+            .event-card {
+                transition: all 0.2s ease-in-out;
+            }
+            .event-card:hover {
+                transform: translateY(-2px);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- 左侧导航栏 -->
+        <aside class="w-16 md:w-64 bg-dark text-white flex flex-col">
+            <!-- Logo -->
+            <div class="p-4 flex items-center justify-center md:justify-start">
+                <div class="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
+                    <i class="fa fa-calendar text-white"></i>
+                </div>
+                <span class="ml-2 hidden md:block text-lg font-semibold">SchedulePro</span>
+            </div>
+            
+            <!-- 导航菜单 -->
+            <nav class="mt-6 flex-1">
+                <ul>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 bg-primary bg-opacity-20 border-l-4 border-primary">
+                            <i class="fa fa-home w-6 text-center"></i>
+                            <span class="ml-2 hidden md:block">Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 hover:bg-gray-800 transition-colors">
+                            <i class="fa fa-calendar-check-o w-6 text-center"></i>
+                            <span class="ml-2 hidden md:block">My Schedule</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 hover:bg-gray-800 transition-colors">
+                            <i class="fa fa-tasks w-6 text-center"></i>
+                            <span class="ml-2 hidden md:block">Tasks</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 hover:bg-gray-800 transition-colors">
+                            <i class="fa fa-users w-6 text-center"></i>
+                            <span class="ml-2 hidden md:block">Meetings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center px-4 py-3 hover:bg-gray-800 transition-colors">
+                            <i class="fa fa-bell w-6 text-center"></i>
+                            <span class="ml-2 hidden md:block">Reminders</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- 底部用户信息 -->
+            <div class="p-4 border-t border-gray-800">
+                <div class="flex items-center">
+                    <div class="w-8 h-8 rounded-full bg-gray-500 flex items-center justify-center">
+                        <span class="text-white font-medium">JD</span>
+                    </div>
+                    <div class="ml-2 hidden md:block">
+                        <p class="text-sm font-medium">John Doe</p>
+                        <p class="text-xs text-gray-400">john@example.com</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- 顶部栏 -->
+            <header class="bg-white shadow-sm z-10">
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex items-center">
+                        <h1 class="text-xl font-semibold text-gray-800">Schedule</h1>
+                        <div class="ml-4 flex items-center bg-gray-100 rounded-md p-1">
+                            <button id="monthViewBtn" class="px-3 py-1 rounded-md bg-primary text-white text-sm font-medium">Month</button>
+                            <button id="weekViewBtn" class="px-3 py-1 rounded-md text-gray-700 text-sm font-medium">Week</button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input type="text" placeholder="Search..." class="pl-8 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <i class="fa fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <button class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-md flex items-center transition-colors">
+                            <i class="fa fa-plus mr-2"></i>
+                            <span>Add Event</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- 内容区域 -->
+            <div class="flex-1 flex overflow-hidden">
+                <!-- 左侧内容区 - 日历/周视图 -->
+                <div class="w-[75%] bg-white m-4 rounded-lg shadow-sm overflow-hidden flex flex-col">
+                    <!-- 月份导航 -->
+                    <div id="monthNav" class="flex items-center justify-between p-4 border-b">
+                        <button class="p-2 rounded-full hover:bg-gray-100">
+                            <i class="fa fa-chevron-left"></i>
+                        </button>
+                        <h2 class="text-lg font-medium">August 2025</h2>
+                        <button class="p-2 rounded-full hover:bg-gray-100">
+                            <i class="fa fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- 周导航 -->
+                    <div id="weekNav" class="flex items-center justify-between p-4 border-b hidden">
+                        <button class="p-2 rounded-full hover:bg-gray-100">
+                            <i class="fa fa-chevron-left"></i>
+                        </button>
+                        <h2 class="text-lg font-medium">August 4 - 10, 2025</h2>
+                        <button class="p-2 rounded-full hover:bg-gray-100">
+                            <i class="fa fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- 月视图 -->
+                    <div id="monthView" class="flex-1 overflow-auto p-4">
+                        <!-- 星期标题 -->
+                        <div class="calendar-grid mb-2">
+                            <div class="text-center font-medium text-gray-500 py-2">Sun</div>
+                            <div class="text-center font-medium text-gray-500 py-2">Mon</div>
+                            <div class="text-center font-medium text-gray-500 py-2">Tue</div>
+                            <div class="text-center font-medium text-gray-500 py-2">Wed</div>
+                            <div class="text-center font-medium text-gray-500 py-2">Thu</div>
+                            <div class="text-center font-medium text-gray-500 py-2">Fri</div>
+                            <div class="text-center font-medium text-gray-500 py-2">Sat</div>
+                        </div>
+                        
+                        <!-- 日历网格 -->
+                        <div class="calendar-grid h-[calc(100%-40px)]">
+                            <!-- 上个月的日期 -->
+                            <div class="bg-gray-50 border border-gray-200 p-2 h-32 overflow-hidden">
+                                <div class="text-gray-400 text-sm">27</div>
+                            </div>
+                            <div class="bg-gray-50 border border-gray-200 p-2 h-32 overflow-hidden">
+                                <div class="text-gray-400 text-sm">28</div>
+                            </div>
+                            <div class="bg-gray-50 border border-gray-200 p-2 h-32 overflow-hidden">
+                                <div class="text-gray-400 text-sm">29</div>
+                            </div>
+                            <div class="bg-gray-50 border border-gray-200 p-2 h-32 overflow-hidden">
+                                <div class="text-gray-400 text-sm">30</div>
+                            </div>
+                            <div class="bg-gray-50 border border-gray-200 p-2 h-32 overflow-hidden">
+                                <div class="text-gray-400 text-sm">31</div>
+                            </div>
+                            
+                            <!-- 当月的日期 -->
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">1</div>
+                                <div class="mt-1 space-y-1">
+                                    <div class="bg-success bg-opacity-20 text-success text-xs p-1 rounded truncate">Team Meeting</div>
+                                    <div class="bg-warning bg-opacity-20 text-warning text-xs p-1 rounded truncate">Lunch with Alex</div>
+                                </div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">2</div>
+                            </div>
+                            
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">3</div>
+                                <div class="mt-1 space-y-1">
+                                    <div class="bg-danger bg-opacity-20 text-danger text-xs p-1 rounded truncate">Movie Night</div>
+                                </div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">4</div>
+                                <div class="mt-1 space-y-1">
+                                    <div class="bg-info bg-opacity-20 text-info text-xs p-1 rounded truncate">Yoga Class</div>
+                                </div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">5</div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">6</div>
+                                <div class="mt-1 space-y-1">
+                                    <div class="bg-success bg-opacity-20 text-success text-xs p-1 rounded truncate">Project Deadline</div>
+                                </div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">7</div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">8</div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">9</div>
+                            </div>
+                            
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">10</div>
+                                <div class="mt-1 space-y-1">
+                                    <div class="bg-warning bg-opacity-20 text-warning text-xs p-1 rounded truncate">Grocery Shopping</div>
+                                </div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">11</div>
+                                <div class="mt-1 space-y-1">
+                                    <div class="bg-success bg-opacity-20 text-success text-xs p-1 rounded truncate">Client Call</div>
+                                    <div class="bg-danger bg-opacity-20 text-danger text-xs p-1 rounded truncate">Dinner Party</div>
+                                </div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">12</div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">13</div>
+                                <div class="mt-1 space-y-1">
+                                    <div class="bg-info bg-opacity-20 text-info text-xs p-1 rounded truncate">Book Club</div>
+                                </div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">14</div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">15</div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">16</div>
+                            </div>
+                            
+                            <!-- 当前日期 -->
+                            <div class="border-2 border-primary bg-blue-50 p-2 h-32 overflow-hidden hover:bg-blue-100 cursor-pointer">
+                                <div class="text-sm font-bold text-primary bg-primary bg-opacity-20 w-6 h-6 rounded-full flex items-center justify-center">17</div>
+                                <div class="mt-1 space-y-1">
+                                    <div class="bg-success bg-opacity-20 text-success text-xs p-1 rounded truncate">Morning Meeting</div>
+                                    <div class="bg-warning bg-opacity-20 text-warning text-xs p-1 rounded truncate">Gym Session</div>
+                                    <div class="bg-danger bg-opacity-20 text-danger text-xs p-1 rounded truncate">Concert</div>
+                                    <div class="bg-info bg-opacity-20 text-info text-xs p-1 rounded truncate">Study Session</div>
+                                    <div class="text-primary text-xs p-1 rounded truncate flex items-center">
+                                        <i class="fa fa-ellipsis-h mr-1"></i> 2 more
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">18</div>
+                                <div class="mt-1 space-y-1">
+                                    <div class="bg-success bg-opacity-20 text-success text-xs p-1 rounded truncate">Workshop</div>
+                                </div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">19</div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">20</div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">21</div>
+                                <div class="mt-1 space-y-1">
+                                    <div class="bg-warning bg-opacity-20 text-warning text-xs p-1 rounded truncate">Family Dinner</div>
+                                </div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">22</div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">23</div>
+                            </div>
+                            
+                            <!-- 更多日期... -->
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">24</div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">25</div>
+                                <div class="mt-1 space-y-1">
+                                    <div class="bg-success bg-opacity-20 text-success text-xs p-1 rounded truncate">Team Retreat</div>
+                                </div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">26</div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">27</div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">28</div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">29</div>
+                            </div>
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">30</div>
+                            </div>
+                            
+                            <div class="border border-gray-200 p-2 h-32 overflow-hidden hover:bg-gray-50 cursor-pointer">
+                                <div class="text-sm">31</div>
+                            </div>
+                            <!-- 下个月的日期 -->
+                            <div class="bg-gray-50 border border-gray-200 p-2 h-32 overflow-hidden">
+                                <div class="text-gray-400 text-sm">1</div>
+                            </div>
+                            <div class="bg-gray-50 border border-gray-200 p-2 h-32 overflow-hidden">
+                                <div class="text-gray-400 text-sm">2</div>
+                            </div>
+                            <div class="bg-gray-50 border border-gray-200 p-2 h-32 overflow-hidden">
+                                <div class="text-gray-400 text-sm">3</div>
+                            </div>
+                            <div class="bg-gray-50 border border-gray-200 p-2 h-32 overflow-hidden">
+                                <div class="text-gray-400 text-sm">4</div>
+                            </div>
+                            <div class="bg-gray-50 border border-gray-200 p-2 h-32 overflow-hidden">
+                                <div class="text-gray-400 text-sm">5</div>
+                            </div>
+                            <div class="bg-gray-50 border border-gray-200 p-2 h-32 overflow-hidden">
+                                <div class="text-gray-400 text-sm">6</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 周视图 -->
+                    <div id="weekView" class="flex-1 overflow-auto p-4 hidden">
+                        <!-- 时间标题行 -->
+                        <div class="week-grid mb-2">
+                            <div class="text-center font-medium text-gray-500 py-2"></div>
+                            <div class="text-center font-medium text-gray-500 py-2">Mon</div>
+                            <div class="text-center font-medium text-gray-500 py-2">Tue</div>
+                            <div class="text-center font-medium text-gray-500 py-2">Wed</div>
+                            <div class="text-center font-medium text-gray-500 py-2">Thu</div>
+                            <div class="text-center font-medium text-gray-500 py-2">Fri</div>
+                            <div class="text-center font-medium text-gray-500 py-2">Sat</div>
+                            <div class="text-center font-medium text-gray-500 py-2">Sun</div>
+                        </div>
+                        
+                        <!-- 时间网格 -->
+                        <div class="week-grid h-[calc(100%-40px)]">
+                            <!-- 时间标签 -->
+                            <div class="flex flex-col">
+                                <div class="time-slot flex items-center justify-center text-gray-500 text-sm border-b border-gray-200">7:00</div>
+                                <div class="time-slot flex items-center justify-center text-gray-500 text-sm border-b border-gray-200">8:00</div>
+                                <div class="time-slot flex items-center justify-center text-gray-500 text-sm border-b border-gray-200">9:00</div>
+                                <div class="time-slot flex items-center justify-center text-gray-500 text-sm border-b border-gray-200">10:00</div>
+                                <div class="time-slot flex items-center justify-center text-gray-500 text-sm border-b border-gray-200">11:00</div>
+                                <div class="time-slot flex items-center justify-center text-gray-500 text-sm border-b border-gray-200">12:00</div>
+                                <div class="time-slot flex items-center justify-center text-gray-500 text-sm border-b border-gray-200">13:00</div>
+                                <div class="time-slot flex items-center justify-center text-gray-500 text-sm border-b border-gray-200">14:00</div>
+                                <div class="time-slot flex items-center justify-center text-gray-500 text-sm border-b border-gray-200">15:00</div>
+                                <div class="time-slot flex items-center justify-center text-gray-500 text-sm border-b border-gray-200">16:00</div>
+                                <div class="time-slot flex items-center justify-center text-gray-500 text-sm border-b border-gray-200">17:00</div>
+                                <div class="time-slot flex items-center justify-center text-gray-500 text-sm border-b border-gray-200">18:00</div>
+                                <div class="time-slot flex items-center justify-center text-gray-500 text-sm border-b border-gray-200">19:00</div>
+                                <div class="time-slot flex items-center justify-center text-gray-500 text-sm border-b border-gray-200">20:00</div>
+                                <div class="time-slot flex items-center justify-center text-gray-500 text-sm">21:00</div>
+                            </div>
+                            
+                            <!-- 周一 -->
+                            <div class="flex flex-col border-l border-gray-200">
+                                <div class="time-slot border-b border-gray-200 relative">
+                                    <div class="absolute inset-0 bg-warning bg-opacity-20 m-1 rounded-md p-1 text-warning text-xs font-medium event-card">
+                                        Exercise<br>7:00-8:00
+                                    </div>
+                                </div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200 relative">
+                                    <div class="absolute inset-0 bg-success bg-opacity-20 m-1 rounded-md p-1 text-success text-xs font-medium event-card">
+                                        Team Meeting<br>9:00-10:00
+                                    </div>
+                                </div>
+                                <div class="time-slot border-b border-gray-200 relative">
+                                    <div class="absolute inset-0 bg-success bg-opacity-20 m-1 rounded-md p-1 text-success text-xs font-medium event-card">
+                                        Team Meeting<br>10:00-11:00
+                                    </div>
+                                </div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot"></div>
+                            </div>
+                            
+                            <!-- 周二 -->
+                            <div class="flex flex-col border-l border-gray-200">
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200 relative">
+                                    <div class="absolute inset-0 bg-success bg-opacity-20 m-1 rounded-md p-1 text-success text-xs font-medium event-card">
+                                        Project Meeting<br>9:00-10:00
+                                    </div>
+                                </div>
+                                <div class="time-slot border-b border-gray-200 relative">
+                                    <div class="absolute inset-0 bg-success bg-opacity-20 m-1 rounded-md p-1 text-success text-xs font-medium event-card">
+                                        Project Meeting<br>10:00-11:00
+                                    </div>
+                                </div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot"></div>
+                            </div>
+                            
+                            <!-- 周三 -->
+                            <div class="flex flex-col border-l border-gray-200">
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200 relative">
+                                    <div class="absolute inset-0 bg-danger bg-opacity-20 m-1 rounded-md p-1 text-danger text-xs font-medium event-card">
+                                        Movie Night<br>19:00-21:00
+                                    </div>
+                                </div>
+                                <div class="time-slot border-b border-gray-200 relative">
+                                    <div class="absolute inset-0 bg-danger bg-opacity-20 m-1 rounded-md p-1 text-danger text-xs font-medium event-card">
+                                        Movie Night<br>20:00-21:00
+                                    </div>
+                                </div>
+                                <div class="time-slot"></div>
+                            </div>
+                            
+                            <!-- 周四 -->
+                            <div class="flex flex-col border-l border-gray-200">
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot"></div>
+                            </div>
+                            
+                            <!-- 周五 -->
+                            <div class="flex flex-col border-l border-gray-200">
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot"></div>
+                            </div>
+                            
+                            <!-- 周六 -->
+                            <div class="flex flex-col border-l border-gray-200">
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot"></div>
+                            </div>
+                            
+                            <!-- 周日 -->
+                            <div class="flex flex-col border-l border-gray-200">
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot border-b border-gray-200"></div>
+                                <div class="time-slot"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右侧内容区 - 今日日程和即将到来的日程 -->
+                <div class="w-[25%] bg-white m-4 rounded-lg shadow-sm overflow-hidden flex flex-col">
+                    <!-- 今日日程 -->
+                    <div class="p-4 border-b">
+                        <h3 class="text-lg font-medium text-gray-800">Today's Schedule</h3>
+                        <p class="text-sm text-gray-500">August 17, 2025</p>
+                    </div>
+                    
+                    <div class="flex-1 overflow-y-auto p-4 space-y-3">
+                        <!-- 今日日程列表 -->
+                        <div class="bg-success bg-opacity-10 border-l-4 border-success p-3 rounded-r-md">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-medium text-success">Morning Meeting</h4>
+                                <span class="text-xs text-gray-500">09:00 AM</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">Conference Room A</p>
+                        </div>
+                        
+                        <div class="bg-warning bg-opacity-10 border-l-4 border-warning p-3 rounded-r-md">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-medium text-warning">Gym Session</h4>
+                                <span class="text-xs text-gray-500">01:00 PM</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">Downtown Fitness Center</p>
+                        </div>
+                        
+                        <div class="bg-danger bg-opacity-10 border-l-4 border-danger p-3 rounded-r-md">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-medium text-danger">Concert</h4>
+                                <span class="text-xs text-gray-500">07:30 PM</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">City Arena</p>
+                        </div>
+                        
+                        <div class="bg-info bg-opacity-10 border-l-4 border-info p-3 rounded-r-md">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-medium text-info">Study Session</h4>
+                                <span class="text-xs text-gray-500">05:00 PM</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">Library</p>
+                        </div>
+                        
+                        <div class="bg-primary bg-opacity-10 border-l-4 border-primary p-3 rounded-r-md">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-medium text-primary">Dinner with Friends</h4>
+                                <span class="text-xs text-gray-500">08:00 PM</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">Mountain View Restaurant</p>
+                        </div>
+                    </div>
+                    
+                    <!-- 即将到来的日程 -->
+                    <div class="p-4 border-t">
+                        <h3 class="text-lg font-medium text-gray-800">Upcoming</h3>
+                    </div>
+                    
+                    <div class="p-4 space-y-3">
+                        <div class="flex items-center p-3 hover:bg-gray-50 rounded-md transition-colors cursor-pointer">
+                            <div class="w-10 h-10 rounded-md bg-success bg-opacity-20 flex items-center justify-center text-success">
+                                <i class="fa fa-briefcase"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="font-medium text-gray-800">Workshop</h4>
+                                <p class="text-xs text-gray-500">Tomorrow, 10:00 AM</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center p-3 hover:bg-gray-50 rounded-md transition-colors cursor-pointer">
+                            <div class="w-10 h-10 rounded-md bg-warning bg-opacity-20 flex items-center justify-center text-warning">
+                                <i class="fa fa-users"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="font-medium text-gray-800">Family Dinner</h4>
+                                <p class="text-xs text-gray-500">Friday, 06:30 PM</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center p-3 hover:bg-gray-50 rounded-md transition-colors cursor-pointer">
+                            <div class="w-10 h-10 rounded-md bg-success bg-opacity-20 flex items-center justify-center text-success">
+                                <i class="fa fa-plane"></i>
+                            </div>
+                            <div class="ml-3">
+                                <h4 class="font-medium text-gray-800">Team Retreat</h4>
+                                <p class="text-xs text-gray-500">August 25, 09:00 AM</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 视图切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const monthViewBtn = document.getElementById('monthViewBtn');
+            const weekViewBtn = document.getElementById('weekViewBtn');
+            const monthView = document.getElementById('monthView');
+            const weekView = document.getElementById('weekView');
+            const monthNav = document.getElementById('monthNav');
+            const weekNav = document.getElementById('weekNav');
+            
+            // 月视图按钮点击事件
+            monthViewBtn.addEventListener('click', function() {
+                monthView.classList.remove('hidden');
+                weekView.classList.add('hidden');
+                monthNav.classList.remove('hidden');
+                weekNav.classList.add('hidden');
+                
+                // 更新按钮样式
+                monthViewBtn.classList.add('bg-primary', 'text-white');
+                monthViewBtn.classList.remove('text-gray-700');
+                weekViewBtn.classList.remove('bg-primary', 'text-white');
+                weekViewBtn.classList.add('text-gray-700');
+            });
+            
+            // 周视图按钮点击事件
+            weekViewBtn.addEventListener('click', function() {
+                monthView.classList.add('hidden');
+                weekView.classList.remove('hidden');
+                monthNav.classList.add('hidden');
+                weekNav.classList.remove('hidden');
+                
+                // 更新按钮样式
+                weekViewBtn.classList.add('bg-primary', 'text-white');
+                weekViewBtn.classList.remove('text-gray-700');
+                monthViewBtn.classList.remove('bg-primary', 'text-white');
+                monthViewBtn.classList.add('text-gray-700');
+            });
+            
+            // 日历日期点击事件 - 显示选中日期的所有日程
+            const calendarDays = document.querySelectorAll('.calendar-grid > div:not(.bg-gray-50)');
+            calendarDays.forEach(day => {
+                day.addEventListener('click', function() {
+                    // 移除其他日期的选中状态
+                    calendarDays.forEach(d => {
+                        d.classList.remove('border-2', 'border-primary', 'bg-blue-50');
+                        d.classList.add('border', 'border-gray-200');
+                    });
+                    
+                    // 添加当前日期的选中状态
+                    this.classList.remove('border', 'border-gray-200');
+                    this.classList.add('border-2', 'border-primary', 'bg-blue-50');
+                    
+                    // 这里可以添加显示该日期所有日程的逻辑
+                    // 例如更新右侧面板的内容
+                });
+            });
+            
+            // 日程卡片悬停效果
+            const eventCards = document.querySelectorAll('.event-card');
+            eventCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.classList.add('shadow-card-hover');
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.classList.remove('shadow-card-hover');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

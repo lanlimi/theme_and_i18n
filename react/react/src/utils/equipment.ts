@@ -6,7 +6,7 @@ export function checkIsMobile() {
     const mobileKeywords = ["android", "iphone", "ipad", "ipod", "windows phone"];
     // 如果包含任何一个关键词，就认为是移动设备
     const isMobile = mobileKeywords.some(keyword => userAgent.includes(keyword));
-    const minWidth = window.matchMedia('(min-width: 768px)').matches;
-    // 如果窗口宽度小于 768px，也认为是移动设备
+    const minWidth = window.matchMedia('(min-width: 1336px)').matches;
+    // 如果窗口宽度小于 1336px，也认为是移动设备
     return isMobile || minWidth;
 }
