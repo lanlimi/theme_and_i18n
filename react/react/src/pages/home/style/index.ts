@@ -1,4 +1,4 @@
-import { customCreateStyles } from '@/utils/customCreateStyles';
+import customCreateStyles from '@/utils/customCreateStyles';
 
 export default customCreateStyles(({ token, css }) => {
   return {

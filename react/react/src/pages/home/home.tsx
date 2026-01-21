@@ -19,6 +19,7 @@ const items: MenuItem[] = [
 const Home = () => {
     const { styles } = useStyles();
     const [collapsed, setCollapsed] = useState(false);
+    const [showMenu, setShowMenu] = useState<string>('1');
 
     const toggleCollapsed = () => {
         setCollapsed(!collapsed);
@@ -36,14 +37,20 @@ const Home = () => {
                         
                     </Header>
                     <Menu
-                        defaultSelectedKeys={['1']}
+                        // defaultSelectedKeys={['1']}
+                        selectedKeys={[showMenu]}
                         mode="inline"
                         theme="dark"
                         inlineCollapsed={collapsed}
                         items={items}
+                        onSelect={(item) => setShowMenu(item.key)}
                     />
                 </Sider>
-                <HomePage />
+                {showMenu === '1' && <HomePage />}
+                {showMenu === '2' && <div>日程管理</div>}
+                {showMenu === '3' && <div>日程订阅</div>}
+                {showMenu === '4' && <div>个性化配置</div>}
+                {showMenu === '5' && <div>设置</div>}
             </Layout>
         </div>
     )

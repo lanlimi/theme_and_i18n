@@ -17,7 +17,7 @@ export interface CssUtil {
  * @param styleFunction 样式函数，接收 token（包含 sizeToken, colorToken）和 css 参数
  * @returns 返回 createStyles 的结果
  */
-export function customCreateStyles(
+export default function customCreateStyles(
     styleFunction: (params: { token: any, css: CssUtil }) => Record<string, any>
 ) {
     return createStyles(({ token, css }) => {

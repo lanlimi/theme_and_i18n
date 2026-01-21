@@ -5,9 +5,9 @@ class AppStore {
     makeAutoObservable(this);
   }
 
-  themeType: 'light' | 'dark' = 'light';
+  themeType: 'light' | 'dark' | 'auto' = 'light';
 
-  setThemeType(themeType: 'light' | 'dark') {
+  setThemeType(themeType: 'light' | 'dark' | 'auto') {
     this.themeType = themeType;
   }
 
