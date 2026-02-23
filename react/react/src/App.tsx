@@ -23,6 +23,7 @@ import { observer } from 'mobx-react-lite';
 function App() {
 
   const Home = lazy(() => import('@/pages/home/home.tsx'))
+  const Login = lazy(() => import('@/pages/login/login.tsx'))
 
   const urlParams = new URLSearchParams(window.location.search);
   const locale = urlParams.get('locale');
@@ -117,6 +118,7 @@ function App() {
                   <Route path="*" element={<Navigate to="/" />} />
                   <Route path="/" element={<Home />} />
                   <Route path="/home" element={<Home />} />
+                  <Route path="/login" element={<Login />} />
                 </Routes>
               </Suspense>
             </BrowserRouter>

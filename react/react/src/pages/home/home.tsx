@@ -5,6 +5,7 @@ import { ContainerOutlined, DesktopOutlined, PieChartOutlined, UploadOutlined, U
 import { Flex, Layout, Menu, Segmented, theme, type MenuProps } from 'antd';
 import Sider from 'antd/es/layout/Sider';
 import { Content, Footer, Header } from 'antd/es/layout/layout';
+import Test from "./components/homePage/test";
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -47,7 +48,8 @@ const Home = () => {
                     />
                 </Sider>
                 {showMenu === '1' && <HomePage />}
-                {showMenu === '2' && <div>日程管理</div>}
+                {/* {showMenu === '2' && <div>日程管理</div>} */}
+                {showMenu === '2' && <Test />}
                 {showMenu === '3' && <div>日程订阅</div>}
                 {showMenu === '4' && <div>个性化配置</div>}
                 {showMenu === '5' && <div>设置</div>}
