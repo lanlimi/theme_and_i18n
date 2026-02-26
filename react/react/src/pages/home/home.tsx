@@ -6,6 +6,9 @@ import { Flex, Layout, Menu, Segmented, theme, type MenuProps } from 'antd';
 import Sider from 'antd/es/layout/Sider';
 import { Content, Footer, Header } from 'antd/es/layout/layout';
 import Test from "./components/homePage/test";
+import ScheduleManage from "./components/schedule/Schedule.tsx";
+import ScheduleSubscribe from "./components/subscribe/scheduleSubscribe.tsx"
+import Setting from "./components/setting/setting.tsx";
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -13,7 +16,7 @@ const items: MenuItem[] = [
     { key: '1', icon: <PieChartOutlined />, label: '主页' },
     { key: '2', icon: <DesktopOutlined />, label: '日程管理' },
     { key: '3', icon: <ContainerOutlined />, label: '日程订阅' },
-    { key: '4', icon: <ContainerOutlined />, label: '个性化配置' },
+    // { key: '4', icon: <ContainerOutlined />, label: '个性化配置' },
     { key: '5', icon: <ContainerOutlined />, label: '设置' },
 ];
 
@@ -48,11 +51,11 @@ const Home = () => {
                     />
                 </Sider>
                 {showMenu === '1' && <HomePage />}
-                {/* {showMenu === '2' && <div>日程管理</div>} */}
-                {showMenu === '2' && <Test />}
-                {showMenu === '3' && <div>日程订阅</div>}
-                {showMenu === '4' && <div>个性化配置</div>}
-                {showMenu === '5' && <div>设置</div>}
+                {showMenu === '2' && <ScheduleManage />}
+                {/* {showMenu === '2' && <Test />} */}
+                {showMenu === '3' && <ScheduleSubscribe />}
+                {/* {showMenu === '4' && <div>个性化配置</div>} */}
+                {showMenu === '5' && <Setting />}
             </Layout>
         </div>
     )

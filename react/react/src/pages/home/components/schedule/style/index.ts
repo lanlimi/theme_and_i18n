@@ -1,22 +1,177 @@
 import customCreateStyles from "@/utils/customCreateStyles"
 
 export default customCreateStyles(({ token, css }) => ({
-    ScheduleBox: css`
-        width: 100vw;
-        height: 100vh;
-    `,
-    LayoutStyle: css`
-        // width: 100%;
+    scheduleContainer: css`
+        width: 100%;
         height: 100%;
         background: ${token.colorBgElevated};
+        display: flex;
+        flex-direction: column;
     `,
-
-    headerStyle: css`
-        height: 64px;
+    
+    operationArea: css`
+        height: 80px;
+        background: ${token.colorHeader};
         display: flex;
         align-items: center;
+        padding: 0 24px;
+        gap: 12px;
+        border-bottom: 1px solid ${token.colorBorder};
+        .ant-checkbox-wrapper {
+            color: ${token.colorText};
+            font-size: 14px;
+        }
+    `,
+    
+    searchArea: css`
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+    `,
+    
+    contentArea: css`
+        flex: 1;
+        padding: 24px;
+        overflow-y: auto;
+    `,
+    
+    loadingContainer: css`
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 300px;
+    `,
+    
+    emptyContainer: css`
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 300px;
+        color: ${token.colorTextSecondary};
+        font-size: 16px;
+    `,
+    
+    scheduleItem: css`
+        margin-bottom: 12px;
+        transition: all 0.3s ease;
+        &:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+    `,
+    
+    scheduleContent: css`
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+    `,
+    
+    checkbox: css`
+        width: 24px;
+        height: 24px;
+        border: 2px solid ${token.colorBorder};
+        border-radius: 4px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        margin-top: 4px;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        &:hover {
+            border-color: ${token.colorPrimary};
+        }
+    `,
+    
+    scheduleInfo: css`
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    `,
+    
+    scheduleTitle: css`
+        font-size: 16px;
+        font-weight: 600;
+        color: ${token.colorText};
+        display: flex;
         justify-content: space-between;
-        padding: 16px;
-        background: ${token.colorHeader};
+        align-items: center;
+    `,
+    
+    editButton: css`
+        font-size: 14px;
+    `,
+    
+    scheduleDetails: css`
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+    `,
+    
+    timeInfo: css`
+        font-size: 14px;
+        color: ${token.colorTextSecondary};
+        white-space: nowrap;
+    `,
+    
+    priorityBadge: css`
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    `,
+    
+    priorityHigh: css`
+        background-color: rgba(245, 34, 45, 0.1);
+        color: ${token.colorError};
+    `,
+    
+    priorityMedium: css`
+        background-color: rgba(250, 173, 20, 0.1);
+        color: ${token.colorWarning};
+    `,
+    
+    priorityLow: css`
+        background-color: rgba(82, 196, 26, 0.1);
+        color: ${token.colorSuccess};
+    `,
+    
+    statusBadge: css`
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 500;
+    `,
+    
+    statusPending: css`
+        background-color: rgba(153, 153, 153, 0.1);
+        color: ${token.colorTextSecondary};
+    `,
+    
+    statusIn_progress: css`
+        background-color: rgba(16, 142, 233, 0.1);
+        color: ${token.colorPrimary};
+    `,
+    
+    statusCompleted: css`
+        background-color: rgba(82, 196, 26, 0.1);
+        color: ${token.colorSuccess};
+    `,
+    
+    scheduleDescription: css`
+        font-size: 14px;
+        color: ${token.colorTextSecondary};
+        line-height: 1.4;
+        margin-top: 4px;
+    `,
+    
+    paginationContainer: css`
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 24px 0;
+        margin-top: 16px;
+        border-top: 1px solid ${token.colorBorder};
     `,
 }))

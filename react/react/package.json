@@ -17,6 +17,7 @@
     "antd": "^6.1.0",
     "antd-style": "^3.7.1",
     "axios": "^1.13.2",
+    "dayjs": "^1.11.19",
     "eventemitter3": "^5.0.1",
     "i18next": "^23.11.5",
     "i18next-browser-languagedetector": "^7.2.1",
