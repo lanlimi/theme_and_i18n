@@ -1,3 +1,155 @@
 {
-    
+	"baseNormal": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeBase}",
+		"fontWeight": "{Font.fontWeightRegular}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightBase}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"baseStrong": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeBase}",
+		"fontWeight": "{Font.fontWeightSemibold}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightBase}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"smNormal": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeSM}",
+		"fontWeight": "{Font.fontWeightRegular}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightSM}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"smStrong": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeSM}",
+		"fontWeight": "{Font.fontWeightSemibold}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightSM}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"mlNormal": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeML}",
+		"fontWeight": "{Font.fontWeightRegular}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightML}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"mlStrong": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeML}",
+		"fontWeight": "{Font.fontWeightSemibold}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightML}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"lgNormal": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeLG}",
+		"fontWeight": "{Font.fontWeightRegular}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightLG}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"lgStrong": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeLG}",
+		"fontWeight": "{Font.fontWeightSemibold}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightLG}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"XLNormal": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeXL}",
+		"fontWeight": "{Font.fontWeightRegular}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightXL}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"XLStrong": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeXL}",
+		"fontWeight": "{Font.fontWeightSemibold}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightXL}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"XXLNormal": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeXXL}",
+		"fontWeight": "{Font.fontWeightRegular}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightXXL}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"XXLStrong": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeXXL}",
+		"fontWeight": "{Font.fontWeightSemibold}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightXXL}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"Heading1": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeHeading1}",
+		"fontWeight": "{Font.fontWeightSemibold}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightHeading1}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"Heading2": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeHeading2}",
+		"fontWeight": "{Font.fontWeightSemibold}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightHeading2}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"Heading3": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeHeading3}",
+		"fontWeight": "{Font.fontWeightSemibold}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightHeading3}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"Heading4": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeHeading4}",
+		"fontWeight": "{Font.fontWeightSemibold}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightHeading4}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	},
+	"Heading5": {
+		"fontFamily": "{Font.fontFamily}",
+		"fontSize": "{Font.fontSizeHeading5}",
+		"fontWeight": "{Font.fontWeightSemibold}",
+		"letterSpacing": "0%",
+		"lineHeight": "{Font.lineHeightHeading5}",
+		"textTransform": "none",
+		"textDecoration": "none"
+	}
 }

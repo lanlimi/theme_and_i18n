@@ -5,6 +5,8 @@ import Size1336Token from '@/assets/customToken/Size.1336.token.json'
 import textStylesToken from '@/assets/customToken/text.styles.token.json'
 import { checkIsMobile } from '@/utils/equipment';
 import { makeAutoObservable } from 'mobx';
+import darkTheme from '@/assets/token/Dark.token.json';
+import lightTheme from '@/assets/token/Light.token.json';
 
 
 class ThemeStore {
@@ -24,6 +26,10 @@ class ThemeStore {
 
     setSize(size: number) {
         this.size = size;
+    }
+
+    get themeToken() {
+        return this.theme === 'light' ? lightTheme : darkTheme;
     }
 
     get colorToken() {

@@ -39,7 +39,7 @@ function App() {
   const [antdLocale, setAntdLocale] = useState<any>(zhCN); // 默认使用中文
 
   // const { themeToken, colorToken, sizeToken, textStylesToken } = themeStore;
-  const { colorToken, sizeToken, textStylesToken } = themeStore;
+  const { themeToken, colorToken, sizeToken, textStylesToken } = themeStore;
 
     // 组件挂载时立即应用正确的主题和语言, 并配置全局message
   useEffect(() => {
@@ -101,9 +101,10 @@ function App() {
       <ConfigProvider
         theme={{
           token: {
-            ...colorToken, // 组件的主题
+            ...themeToken.token as any, // 组件的主题
+            // ...colorToken, // 组件的主题
             // ...sizeToken, // 组件的尺寸
-            // ...textStylesToken
+            ...textStylesToken
           },
         }}
         locale={customAntdLocale} // 自定义Ant Design的语言包
