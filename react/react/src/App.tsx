@@ -15,6 +15,7 @@ import loadLanguageAsync from './locales/locales';
 import appStore from './stores/appStore';
 import { debounce } from 'lodash-es';
 import { observer } from 'mobx-react-lite';
+import userInfoStore from './stores/userInfo';
 
 // 1、优先完成国际化配置
 // 2、阿里icon组件（可变色icon和彩色icon）配置
@@ -57,6 +58,23 @@ function App() {
         themeStore.setTheme(savedTheme === 'dark' ? 'dark' : 'light');
       }
     }
+
+
+
+    const userStore = localStorage.getItem('user');
+    if (userStore) {
+      const userInfo = JSON.parse(userStore)
+      // 将用户信息存储到userInfoStore
+      userInfoStore.setUserInfo({
+        id: userInfo.id.toString(),
+        name: userInfo.nickname || userInfo.username,
+        avatar: userInfo.avatar || '',
+        email: userInfo.email,
+        phone: '',
+        role: 'user'
+      });
+    }
+
 
     // // 配置全局message
     // message.config({

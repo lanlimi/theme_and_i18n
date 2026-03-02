@@ -4,6 +4,7 @@ import { UserOutlined, EditOutlined, LockOutlined, SaveOutlined, UploadOutlined 
 import useStyles from './style/index.ts';
 import { authApi, type User } from '@/api';
 import type { UploadFile, UploadProps } from 'antd/es/upload';
+import userInfoStore from "@/stores/userInfo.ts";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -106,6 +107,14 @@ const Setting: React.FC = () => {
                     await authApi.updateUser({ avatar: base64Url });
                     message.success('头像上传成功');
                     setUser({ ...user!, avatar: base64Url });
+                    userInfoStore.setUserInfo({
+                        id: user?.id.toString() as any,
+                        name: user?.nickname || user?.username as any,
+                        avatar: base64Url,
+                        email: user?.email as any,
+                        phone: '',
+                        role: 'user'
+                    })
                     onSuccess?.('ok');
                 } catch (error: any) {
                     message.error(error.response?.data?.error || '头像上传失败');
@@ -244,7 +253,7 @@ const Setting: React.FC = () => {
                                     )}
                                 </div>
                                 
-                                <div className={styles.infoItem}>
+                                {/* <div className={styles.infoItem}>
                                     <div className={styles.label}>主题偏好</div>
                                     {editing ? (
                                         <Form.Item name="theme" noStyle>
@@ -256,7 +265,7 @@ const Setting: React.FC = () => {
                                     ) : (
                                         <div className={styles.value}>{user.theme === 'light' ? '亮色' : '暗色'}</div>
                                     )}
-                                </div>
+                                </div> */}
                             </div>
                             
                             {/* 操作按钮 */}

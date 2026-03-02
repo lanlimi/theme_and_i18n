@@ -49,7 +49,7 @@ export default customCreateStyles(({ token, css }) => ({
         cursor: pointer;
         &:hover {
             background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
+            // transform: translateY(-2px);
             box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
             border-color: ${token.colorPrimary}40;
         }
@@ -293,6 +293,8 @@ export default customCreateStyles(({ token, css }) => ({
         min-width: 0;
         flex-shrink: 1;
         overflow: hidden;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
 
         &:hover {
             border-color: ${token.colorPrimary};
@@ -301,6 +303,7 @@ export default customCreateStyles(({ token, css }) => ({
         }
 
         ::-webkit-scrollbar {
+            display: none;
             width: 0;
             height: 0;
         }
@@ -339,6 +342,13 @@ export default customCreateStyles(({ token, css }) => ({
         flex-direction: column;
         gap: 8px;
         overflow-y: auto;
+        overflow-x: hidden;
+
+        ::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+        }
     `,
 
     weekScheduleItem: css`
@@ -427,7 +437,7 @@ export default customCreateStyles(({ token, css }) => ({
         min-height: 120px;
 
         &:hover {
-            border-color: ${token.colorPrimary};
+            // border-color: ${token.colorPrimary};
             transform: translateY(-4px);
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
         }
@@ -438,7 +448,7 @@ export default customCreateStyles(({ token, css }) => ({
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, ${token.colorPrimary}, ${token.colorPrimary}dd);
+            // background: linear-gradient(90deg, ${token.colorPrimary}, ${token.colorPrimary}dd);
             opacity: 0;
             transition: opacity 0.3s ease;
         }

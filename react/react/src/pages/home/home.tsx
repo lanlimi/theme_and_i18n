@@ -31,14 +31,11 @@ const Home = () => {
     return (
         <div className={styles.root}>
             
-            <Layout style={{
-                width: '100%',
-                height: '100%',
-            }}>
-                <Sider style={{ width: '20%' }}>
-                    <Header style={{ background: '#696969', height: 64, padding: 12 }}>
-                        
-                    </Header>
+            <Layout className='LayoutStyle'>
+                <Sider className="siderStyle">
+                    <div className="titleBox">
+                        让每天都变的高效和愉快！
+                    </div>
                     <Menu
                         // defaultSelectedKeys={['1']}
                         selectedKeys={[showMenu]}
@@ -49,7 +46,7 @@ const Home = () => {
                         onSelect={(item) => setShowMenu(item.key)}
                     />
                 </Sider>
-                {showMenu === '1' && <HomePage />}
+                {showMenu === '1' && <HomePage setShowMenu={setShowMenu} />}
                 {showMenu === '2' && <ScheduleManage />}
                 {/* {showMenu === '2' && <Test />} */}
                 {showMenu === '3' && <ScheduleSubscribe />}

@@ -10,11 +10,18 @@ import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import appStore from '@/stores/appStore';
 import themeStore from '@/stores/theme';
+import { toJS } from 'mobx';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-const HomePage: React.FC = () => {
+interface HomePageProps {
+  setShowMenu: any
+}
+
+const HomePage: React.FC<HomePageProps> = ({
+  setShowMenu,
+}) => {
   const { styles } = useStyles();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewType, setViewType] = useState<'week' | 'month'>('week');
@@ -27,7 +34,6 @@ const HomePage: React.FC = () => {
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
   const [form] = Form.useForm();
   const [daySchedules, setDaySchedules] = useState<Schedule[]>([]);
-  const [themeMode, setThemeMode] = useState('light');
 
 
   const [year, setYear] = useState<any>()
@@ -41,6 +47,7 @@ const HomePage: React.FC = () => {
   const today = new Date();
 
   const userInfo = userInfoStore.userInfo;
+  console.log('用户信息', toJS(userInfo))
 
   const fetchSchedules = async () => {
     setLoading(true);
@@ -241,7 +248,7 @@ const HomePage: React.FC = () => {
         <div className={styles.headerLeft}>
           <div 
             className={styles.userInfo}
-            onClick={() => window.location.href = '/profile'}
+            onClick={() => setShowMenu('5')}
           >
             <Avatar 
               size={48} 
