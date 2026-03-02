@@ -12,7 +12,7 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     nickname = db.Column(db.String(50), nullable=True)  # 昵称
-    avatar = db.Column(db.String(255), nullable=True)  # 头像URL
+    avatar = db.Column(db.Text().with_variant(db.Text(length=4294967295), 'mysql'), nullable=True)  # 头像URL或Base64数据，使用LONGTEXT
     bio = db.Column(db.Text, nullable=True)  # 个人简介
     language = db.Column(db.String(10), default='zh-CN')  # 语言设置
     theme = db.Column(db.String(10), default='light')  # 主题偏好

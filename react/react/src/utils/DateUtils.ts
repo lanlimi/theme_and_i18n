@@ -56,14 +56,13 @@ export const getMonthData = (year: number, month: number) => {
 };
 
 // 获取周数据
-export const getWeekData = (year: any, month: any, date: any) => {
+export const getWeekData = (date: Date) => {
   const result = [];
-  const currentDate = new Date(year, month - 1, date);
-  const currentDay = currentDate.getDay();
+  const currentDay = date.getDay();
   
   // 获取本周一的日期
-  const monday = new Date(currentDate);
-  monday.setDate(currentDate.getDate() - (currentDay === 0 ? 6 : currentDay - 1));
+  const monday = new Date(date);
+  monday.setDate(date.getDate() - (currentDay === 0 ? 6 : currentDay - 1));
   
   // 生成一周7天的数据
   for (let i = 0; i < 7; i++) {

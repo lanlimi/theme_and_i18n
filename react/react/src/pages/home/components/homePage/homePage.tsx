@@ -1,142 +1,267 @@
-import React, { useState } from 'react';
-import { AntDesignOutlined, ContainerOutlined, DesktopOutlined, LeftOutlined, MoonOutlined, PieChartOutlined, RightOutlined, SunOutlined, UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
-import { Avatar, Flex, Layout, Menu, Segmented, theme, type MenuProps } from 'antd';
-import Sider from 'antd/es/layout/Sider';
-import { Content, Footer, Header } from 'antd/es/layout/layout';
-import { getMonthData, getWeekdayNames } from '@/utils/DateUtils';
+import React, { useState, useEffect } from 'react';
+import { Avatar, Modal, Form, Input, Select, DatePicker, Button, message, Empty, Segmented, ConfigProvider } from 'antd';
+import zhCN from 'antd/locale/zh_CN';
+import { PlusOutlined, LeftOutlined, RightOutlined, CalendarOutlined, ClockCircleOutlined, SunOutlined, MoonOutlined } from '@ant-design/icons';
+import { getMonthData, getWeekdayNames, getWeekData } from '@/utils/DateUtils';
 import useStyles from './style/index';
+import userInfoStore from '@/stores/userInfo';
+import { scheduleApi, type Schedule } from '@/api';
+import dayjs from 'dayjs';
+import type { Dayjs } from 'dayjs';
 import appStore from '@/stores/appStore';
 import themeStore from '@/stores/theme';
 
+const { Option } = Select;
+const { RangePicker } = DatePicker;
 
-interface HomePageProps {
-  schedules?: any;
-}
-
-
-const HomePage: React.FC<HomePageProps> = ({ schedules = [] }) => {
-
+const HomePage: React.FC = () => {
   const { styles } = useStyles();
-
   const [currentDate, setCurrentDate] = useState(new Date());
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth() + 1;
-  const date = currentDate.getDate();
+  const [viewType, setViewType] = useState<'week' | 'month'>('week');
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [dayModalVisible, setDayModalVisible] = useState(false);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [scheduleDetailModalVisible, setScheduleDetailModalVisible] = useState(false);
+  const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(null);
+  const [form] = Form.useForm();
+  const [daySchedules, setDaySchedules] = useState<Schedule[]>([]);
+  const [themeMode, setThemeMode] = useState('light');
 
-  const monthData = getMonthData(year, month);
-  const weekdayNames = getWeekdayNames();
+
+  const [year, setYear] = useState<any>()
+  const [month, setMonth] = useState<any>()
+
+  useEffect(() => {
+    setYear(currentDate.getFullYear())
+    setMonth(currentDate.getMonth() + 1)
+    console.log('切换到下个月', currentDate.getFullYear(), currentDate.getMonth() + 1)
+  }, [currentDate])
   const today = new Date();
-  const [viewType, setViewType] = useState('week');
 
-  // 将日期数据转换为7列网格
-  const weeks = [];
-  for (let i = 0; i < monthData.length; i += 7) {
-    weeks.push(monthData.slice(i, i + 7));
-  }
-  console.log('周数据', weeks);
-  // 切换视图
-  const handleViewChange = (type: any) => {
+  const userInfo = userInfoStore.userInfo;
+
+  const fetchSchedules = async () => {
+    setLoading(true);
+    try {
+      const response = await scheduleApi.getSchedules();
+      const data = response as any;
+      setSchedules(data.schedules);
+    } catch (error: any) {
+      message.error(error.response?.data?.error || '获取日程失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSchedules();
+  }, []);
+
+  const handleViewChange = (type: 'week' | 'month') => {
     setViewType(type);
   };
 
-  // 切换月份
   const handlePrevMonth = () => {
-    setCurrentDate(new Date(year, month - 2, date));
+    if (viewType === 'week') {
+      // 周视图：切换到上一周
+      const prevWeek = new Date(currentDate);
+      prevWeek.setDate(currentDate.getDate() - 7);
+      setCurrentDate(prevWeek);
+    } else {
+      // 月视图：切换到上个月
+      setCurrentDate(new Date(year, month - 2, 1));
+    }
   };
 
   const handleNextMonth = () => {
-    setCurrentDate(new Date(year, month, date));
+    if (viewType === 'week') {
+      // 周视图：切换到下一周
+      const nextWeek = new Date(currentDate);
+      nextWeek.setDate(currentDate.getDate() + 7);
+      setCurrentDate(nextWeek);
+    } else {
+      // 月视图：切换到下个月
+      setCurrentDate(new Date(year, month, 1));
+    }
   };
 
-  // 回到今天
   const handleToday = () => {
     setCurrentDate(new Date());
   };
 
-  // 获取某天的日程
-  const getDaySchedules = (dateObj: any) => {
-    return schedules.filter((schedule: any) => {
-      const scheduleDate = new Date(schedule.startTime);
-      return (
-        scheduleDate.getFullYear() === dateObj.year &&
-        scheduleDate.getMonth() + 1 === dateObj.month &&
-        scheduleDate.getDate() === dateObj.date
-      );
+  // 将UTC时间转换为本地日期字符串（YYYY-MM-DD）
+  const getLocalDateString = (utcTimeStr: string) => {
+    const date = new Date(utcTimeStr);
+    // 确保使用本地时间，避免时区偏移问题
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  // 获取日程的样式类名
+  const getScheduleClassName = (schedule: Schedule, view: 'day' | 'week') => {
+    const baseClass = view === 'day' ? styles.dayScheduleItem : styles.weekScheduleItem;
+    if (schedule.status === 'completed') {
+      return `${baseClass} ${view === 'day' ? styles.dayScheduleItemCompleted : styles.weekScheduleItemCompleted}`;
+    }
+    switch (schedule.priority) {
+      case 'high':
+        return `${baseClass} ${view === 'day' ? styles.dayScheduleItemHigh : styles.weekScheduleItemHigh}`;
+      case 'medium':
+        return `${baseClass} ${view === 'day' ? styles.dayScheduleItemMedium : styles.weekScheduleItemMedium}`;
+      case 'low':
+        return `${baseClass} ${view === 'day' ? styles.dayScheduleItemLow : styles.weekScheduleItemLow}`;
+      default:
+        return baseClass;
+    }
+  };
+
+  const getDaySchedules = (dateObj: Date) => {
+    const targetDateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+    return schedules.filter(schedule => {
+      const scheduleDateStr = getLocalDateString(schedule.start_time);
+      return scheduleDateStr === targetDateStr;
     });
   };
 
-  const [themeMode, setThemeMode] = useState('light');
+  // 获取今日所有日程（按时间顺序）
+  const getTodaySchedules = () => {
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    return schedules
+      .filter(schedule => getLocalDateString(schedule.start_time) === todayStr)
+      .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+  };
 
+  // 获取下一个高优先级日程
+  const getNextHighPrioritySchedule = () => {
+    const now = new Date();
+    const highPrioritySchedules = schedules.filter(schedule => {
+      return schedule.priority === 'high' && new Date(schedule.start_time) >= now;
+    });
+    if (highPrioritySchedules.length === 0) return null;
 
-    // 切换到亮色主题
+    return highPrioritySchedules.sort((a, b) => 
+      new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+    )[0];
+  };
+
+  const handleDayClick = (dateObj: Date) => {
+    setSelectedDate(dateObj);
+    setDaySchedules(getDaySchedules(dateObj));
+    setDayModalVisible(true);
+  };
+
+  // 点击日程卡片显示详情
+  const handleScheduleCardClick = (schedule: Schedule) => {
+    setSelectedSchedule(schedule);
+    setScheduleDetailModalVisible(true);
+  };
+
+  const handleCreateSchedule = async (values: any) => {
+    setLoading(true);
+    try {
+      const { timeRange, ...rest } = values;
+      // 确保时间是本地时间，避免时区问题
+      // 直接使用dayjs对象的format方法，避免toISOString()的时区转换
+      await scheduleApi.createSchedule({
+        ...rest,
+        start_time: timeRange[0].format('YYYY-MM-DD HH:mm:ss'),
+        end_time: timeRange[1].format('YYYY-MM-DD HH:mm:ss')
+      });
+      message.success('创建日程成功');
+      setCreateModalVisible(false);
+      form.resetFields();
+      fetchSchedules();
+    } catch (error: any) {
+      message.error(error.response?.data?.error || '创建日程失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const monthData = getMonthData(year, month);
+  const weekdayNames = getWeekdayNames();
+  const weekData = getWeekData(currentDate);
+  console.log('周数据', weekData)
+
+  const isToday = (dateObj: Date) => {
+    return (
+      dateObj.getFullYear() === today.getFullYear() &&
+      dateObj.getMonth() === today.getMonth() &&
+      dateObj.getDate() === today.getDate()
+    );
+  };
+
+  const isOtherMonth = (dateObj: Date) => {
+    return dateObj.getMonth() !== currentDate.getMonth();
+  };
+
+  const formatTime = (timeStr: string) => {
+    const date = new Date(timeStr);
+    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  };
+
+  const formatDate = (dateObj: Date) => {
+    return `${dateObj.getMonth() + 1}月${dateObj.getDate()}日`;
+  };
+
+  const getPriorityText = (priority: string) => {
+    const map = { high: '高', medium: '中', low: '低' };
+    return map[priority as keyof typeof map] || '中';
+  };
+
+  const getStatusText = (status: string) => {
+    const map = { pending: '待处理', in_progress: '进行中', completed: '已完成' };
+    return map[status as keyof typeof map] || '待处理';
+  };
+
   const handleSwitchToLight = () => {
     appStore.setThemeType('light');
     localStorage.setItem('themeType', 'light');
-    // 更新根元素背景颜色，避免刷新页面或和切换路由时，或者在切换主题后切换路由时html背景色与主题色不符合造成闪烁
     document.documentElement.style.backgroundColor = 'white';
     themeStore.setTheme('light');
   };
 
-  // 切换到暗色主题
   const handleSwitchToDark = () => {
     appStore.setThemeType('dark');
     localStorage.setItem('themeType', 'dark');
-    // 更新根元素背景颜色，避免刷新页面或和切换路由时，或者在切换主题后切换路由时html背景色与主题色不符合造成闪烁
     document.documentElement.style.backgroundColor = '#151515';
     themeStore.setTheme('dark');
   };
 
-  // 切换到跟随系统主题
-  const handleSwitchToAuto = () => {
-    // 系统主题是否为夜晚模式
-    let isDark = window.matchMedia("(prefers-color-scheme: dark)")
-
-    // 在不手动切换浏览器主题的情况下，isDark.addEventListener('change',function(){})不会触发监视
-    // 所以在从亮色或者暗色模式切换到自动模式时，判断系统主题是否与切换前是否一致，不一致就切换成系统主题
-    // 系统主题为暗黑模式，且当前主题为亮色时，切换为暗色主题
-    if (appStore.themeType === 'dark' && !isDark.matches) {
-      // 更新根元素背景颜色，避免刷新页面或和切换路由时，或者在切换主题后切换路由时html背景色与主题色不符合造成闪烁
-      document.documentElement.style.backgroundColor = 'white';
-      themeStore.setTheme('light');
-    }
-    // 系统主题为亮色模式，且当前主题为暗色时，切换为亮色主题
-    if (appStore.themeType === 'light' && isDark.matches) {
-      // 更新根元素背景颜色，避免刷新页面或和切换路由时，或者在切换主题后切换路由时html背景色与主题色不符合造成闪烁
-      document.documentElement.style.backgroundColor = '#151515';
-      themeStore.setTheme('dark');
-    }
-
-    appStore.setThemeType('auto');
-    localStorage.setItem('themeType', 'auto');
-    isDark.addEventListener('change', function () {
-      // console.log(`当前的主题是:${this.matches?'light':'dark'}`)
-      if (this.matches && appStore.themeType === 'auto') {
-        // 更新根元素背景颜色，避免刷新页面或和切换路由时，或者在切换主题后切换路由时html背景色与主题色不符合造成闪烁
-        document.documentElement.style.backgroundColor = '#151515';
-        themeStore.setTheme('dark');
-        return
-      }
-      // 更新根元素背景颜色，避免刷新页面或和切换路由时，或者在切换主题后切换路由时html背景色与主题色不符合造成闪烁
-      document.documentElement.style.backgroundColor = 'white';
-      themeStore.setTheme('light');
-    })
-  };
-
   return (
-    <Layout
-      className={styles.LayoutStyle}
-    // style={{
-    //   height: '100%',
-    //   background: '#000000',
-    // }}
-    >
-      {/* <Header style={{ background: '#282828', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16 }}> */}
-      <Header className={styles.headerStyle}>
-        <Segmented style={{color: '#ffffff'}} options={['周视图', '月视图']} />
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+    <ConfigProvider locale={zhCN}>
+      <div className={styles.LayoutStyle}>
+      {/* 顶部信息区：展示当前登录用户的昵称与头像 */}
+      <div className={styles.headerStyle}>
+        <div className={styles.headerLeft}>
+          <div 
+            className={styles.userInfo}
+            onClick={() => window.location.href = '/profile'}
+          >
+            <Avatar 
+              size={48} 
+              src={userInfo.avatar} 
+              icon={<CalendarOutlined />}
+            />
+            <div className={styles.userInfoText}>
+              <div className={styles.userName}>{userInfo.name || '用户'}</div>
+              <div className={styles.userEmail}>{userInfo.email}</div>
+            </div>
+          </div>
+        </div>
+        <div className={styles.headerRight}>
+          <Segmented 
+            value={viewType}
+            options={[{ value: 'week', label: '周视图' }, { value: 'month', label: '月视图' }]}
+            onChange={(value) => handleViewChange(value as 'week' | 'month')}
+          />
           <Segmented
-            value={themeMode}
+            value={appStore.themeType}
             shape="round"
             options={[
               { value: 'light', icon: <SunOutlined /> },
@@ -147,63 +272,377 @@ const HomePage: React.FC<HomePageProps> = ({ schedules = [] }) => {
                 handleSwitchToLight();
               } else if (value === 'dark') {
                 handleSwitchToDark();
-              } else if (value === 'auto') {
-                handleSwitchToAuto();
               }
-              setThemeMode(value);
+              // setThemeMode(value);
             }}
           />
-          <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#ffffff' }}>
-            测试
-          </div>
-          <Avatar
-            size="large"
-            icon={<AntDesignOutlined />}
-          />
         </div>
-      </Header>
-      <div style={{
-        flex: 1,
-        width: '100%',
-        padding: '16px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
-        <div style={{ height: '100%', flex: 1, backgroundColor: '#464646', padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '64px' }}>
-            <LeftOutlined onClick={handlePrevMonth} />
-            <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#ffffff' }}>
-              {year}年{month}月
-            </div>
-            <RightOutlined onClick={handleNextMonth} />
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px', height: '48px' }}>
-            {weekdayNames.map(item => (
-              <div key={item} style={{ fontSize: '16px', fontWeight: 'bold', color: '#ffffff', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                {item}
-              </div>
-            ))}
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '8px', flex: 1 }}>
-            {monthData.map((item, index) => (
-              <div key={index} style={{
-                padding: '8px',
-                backgroundColor: '#333333',
-                color: '#ffffff',
-                textAlign: 'center',
-              }}>
-                {item.date}
-              </div>
-            ))}
-          </div>
-
-        </div>
-        <div style={{ width: '20%', height: '100%', backgroundColor: '#282828', padding: '16px' }}></div>
       </div>
-    </Layout>
+
+      {/* 主体内容区 */}
+      <div className={styles.mainContainer}>
+        {/* 中下核心视图区：周视图与月视图切换 */}
+        <div className={styles.contentArea}>
+          <div className={styles.viewControls}>
+            <div className={styles.dateNavigation}>
+              <button className={styles.navButton} onClick={handlePrevMonth}>
+                <LeftOutlined />
+              </button>
+              <div className={styles.dateDisplay}>
+                {year}年{month}月
+              </div>
+              <button className={styles.navButton} onClick={handleNextMonth}>
+                <RightOutlined />
+              </button>
+              <button className={styles.todayButton} onClick={handleToday}>
+                今天
+              </button>
+            </div>
+          </div>
+
+          <div className={styles.calendarContainer}>
+            {/* 月视图 */}
+            {viewType === 'month' && (
+              <>
+                <div className={styles.weekdayHeader}>
+                  {weekdayNames.map(day => (
+                    <div key={day} className={styles.weekdayItem}>
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                <div className={styles.monthGrid}>
+                  {monthData.map((item, index) => {
+                    const dateObj = new Date(item.year, item.month - 1, item.date);
+                    const daySchedules = getDaySchedules(dateObj);
+                    return (
+                      <div 
+                        key={index}
+                        className={`${styles.dayCell} ${
+                          isToday(dateObj) ? styles.dayCellToday : ''
+                        } ${
+                          isOtherMonth(dateObj) ? styles.dayCellOtherMonth : ''
+                        }`}
+                        onClick={() => handleDayClick(dateObj)}
+                      >
+                        <div className={styles.dayNumber}>{item.date}</div>
+                        <div className={styles.daySchedules}>
+                          {daySchedules.slice(0, 3).map(schedule => (
+                            <div key={schedule.id} className={getScheduleClassName(schedule, 'day')}>
+                              {schedule.title}
+                            </div>
+                          ))}
+                          {daySchedules.length > 3 && (
+                            <div className={styles.moreSchedules}>
+                              +{daySchedules.length - 3}更多
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+
+            {/* 周视图 */}
+            {viewType === 'week' && (
+              <div className={styles.weekView}>
+                {weekData.map((day, index) => {
+                  const dateObj = new Date(day.year, day.month - 1, day.date);
+                  const daySchedules = getDaySchedules(dateObj);
+                  return (
+                    <div 
+                      key={index}
+                      className={`${styles.weekDay} ${
+                        isToday(dateObj) ? styles.weekDayToday : ''
+                      }`}
+                      onClick={() => handleDayClick(dateObj)}
+                    >
+                      <div className={styles.weekDayHeader}>
+                        <div className={styles.weekDayDate}>{day.date}</div>
+                        <div className={styles.weekDayWeekday}>{weekdayNames[day.weekday]}</div>
+                      </div>
+                      <div className={styles.weekDaySchedules}>
+                        {daySchedules.length === 0 ? (
+                          <div className={styles.emptyState}>
+                            <div className={styles.emptyIcon}>📅</div>
+                            <div>无日程</div>
+                          </div>
+                        ) : (
+                          daySchedules.map(schedule => (
+                            <div 
+                              key={schedule.id}
+                              className={getScheduleClassName(schedule, 'week')}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDayClick(dateObj);
+                              }}
+                            >
+                              <div>{schedule.title}</div>
+                              <div style={{ fontSize: 10, opacity: 0.9 }}>
+                                {formatTime(schedule.start_time)} - {formatTime(schedule.end_time)}
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 右下快捷信息区 */}
+        <div className={styles.sidePanel}>
+          {/* 上半部分：今日所有日程 */}
+          <div className={styles.todaySection}>
+            <div className={styles.sideSectionTitle}>
+              <ClockCircleOutlined /> 今日日程
+            </div>
+            <div className={styles.scheduleList}>
+              {getTodaySchedules().length === 0 ? (
+                <div className={styles.emptyState}>
+                  <div className={styles.emptyIcon}>📋</div>
+                  <div>今日暂无日程</div>
+                </div>
+              ) : (
+                getTodaySchedules().map(schedule => (
+                  <div 
+                    key={schedule.id}
+                    className={styles.scheduleCard}
+                    onClick={() => handleScheduleCardClick(schedule)}
+                  >
+                    <div className={styles.scheduleCardTitle}>{schedule.title}</div>
+                    <div className={styles.scheduleCardTime}>
+                      <CalendarOutlined /> {formatTime(schedule.start_time)} - {formatTime(schedule.end_time)}
+                    </div>
+                    <span className={`${styles.scheduleCardPriority} ${styles[`priority${schedule.priority.charAt(0).toUpperCase() + schedule.priority.slice(1)}`]}`}>
+                      {getPriorityText(schedule.priority)}
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* 下半部分：下一个高优先级日程 */}
+          <div className={styles.prioritySection}>
+            <div className={styles.sideSectionTitle}>
+              <CalendarOutlined /> 重要日程
+            </div>
+            {getNextHighPrioritySchedule() ? (
+              <div 
+                className={`${styles.scheduleCard} ${styles.importantScheduleCard}`}
+                onClick={() => handleScheduleCardClick(getNextHighPrioritySchedule()!)}
+              >
+                <div className={styles.scheduleCardTitle}>{getNextHighPrioritySchedule()?.title}</div>
+                <div className={styles.scheduleCardTime}>
+                  <CalendarOutlined /> {formatDate(new Date(getNextHighPrioritySchedule()!.start_time))} {formatTime(getNextHighPrioritySchedule()!.start_time)}
+                </div>
+                <span className={`${styles.scheduleCardPriority} ${styles.priorityHigh}`}>
+                  {getPriorityText(getNextHighPrioritySchedule()!.priority)}
+                </span>
+                {getNextHighPrioritySchedule()!.description && (
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', marginTop: 10, lineHeight: 1.6 }}>
+                    {getNextHighPrioritySchedule()!.description}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className={styles.emptyState}>
+                <div className={styles.emptyIcon}>⭐</div>
+                <div>暂无高优先级日程</div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <Modal
+        title={`${selectedDate ? formatDate(selectedDate) : ''}的日程`}
+        open={dayModalVisible}
+        onCancel={() => setDayModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <div className={styles.modalContent}>
+          {daySchedules.length === 0 ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>📅</div>
+              <div>暂无日程</div>
+            </div>
+          ) : (
+            <div className={styles.modalScheduleList}>
+              {daySchedules.map(schedule => (
+                <div 
+                  key={schedule.id} 
+                  className={styles.modalScheduleItem}
+                  onClick={() => {
+                    setDayModalVisible(false);
+                    handleScheduleCardClick(schedule);
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className={styles.modalScheduleTitle}>{schedule.title}</div>
+                  <div className={styles.modalScheduleTime}>
+                    <ClockCircleOutlined /> {formatTime(schedule.start_time)} - {formatTime(schedule.end_time)}
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 8 }}>
+                    <span className={`${styles.scheduleCardPriority} ${styles[`priority${schedule.priority.charAt(0).toUpperCase() + schedule.priority.slice(1)}`]}`}>
+                      {getPriorityText(schedule.priority)}
+                    </span>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>
+                      {getStatusText(schedule.status)}
+                    </span>
+                  </div>
+                  {schedule.description && (
+                    <div className={styles.modalScheduleDescription}>
+                      {schedule.description}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          <Button 
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              setDayModalVisible(false);
+              setCreateModalVisible(true);
+            }}
+            className={styles.createButton}
+          >
+            新建日程
+          </Button>
+        </div>
+      </Modal>
+
+      <Modal
+        title="创建日程"
+        open={createModalVisible}
+        onCancel={() => setCreateModalVisible(false)}
+        footer={null}
+        width={600}
+      >
+        <Form
+          form={form}
+          onFinish={handleCreateSchedule}
+          layout="vertical"
+        >
+          <Form.Item
+            name="title"
+            label="标题"
+            rules={[{ required: true, message: '请输入标题' }]}
+          >
+            <Input placeholder="请输入日程标题" />
+          </Form.Item>
+          <Form.Item
+            name="description"
+            label="描述"
+          >
+            <Input.TextArea placeholder="请输入日程描述" rows={3} />
+          </Form.Item>
+          <Form.Item
+            name="timeRange"
+            label="时间范围"
+            rules={[{ required: true, message: '请选择时间范围' }]}
+          >
+            <RangePicker 
+              showTime 
+              format="YYYY-MM-DD HH:mm:ss"
+              style={{ width: '100%' }}
+            />
+          </Form.Item>
+          <Form.Item
+            name="priority"
+            label="优先级"
+            initialValue="medium"
+          >
+            <Select>
+              <Option value="high">高</Option>
+              <Option value="medium">中</Option>
+              <Option value="low">低</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            name="status"
+            label="状态"
+            initialValue="pending"
+          >
+            <Select>
+              <Option value="pending">待处理</Option>
+              <Option value="in_progress">进行中</Option>
+              <Option value="completed">已完成</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" style={{ marginRight: 8 }} loading={loading}>
+              确定
+            </Button>
+            <Button onClick={() => setCreateModalVisible(false)}>
+              取消
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* 日程详情弹窗 */}
+      <Modal
+        title="日程详情"
+        open={scheduleDetailModalVisible}
+        onCancel={() => setScheduleDetailModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setScheduleDetailModalVisible(false)}>
+            关闭
+          </Button>
+        ]}
+        width={500}
+      >
+        {selectedSchedule && (
+          <div className={styles.modalContent}>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>标题</div>
+              <div style={{ fontSize: 16, fontWeight: 600 }}>{selectedSchedule.title}</div>
+            </div>
+            
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>时间</div>
+              <div style={{ fontSize: 14 }}>
+                <ClockCircleOutlined style={{ marginRight: 8 }} />
+                {formatDate(new Date(selectedSchedule.start_time))} {formatTime(selectedSchedule.start_time)} - {formatTime(selectedSchedule.end_time)}
+              </div>
+            </div>
+            
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>优先级</div>
+              <span className={`${styles.scheduleCardPriority} ${styles[`priority${selectedSchedule.priority.charAt(0).toUpperCase() + selectedSchedule.priority.slice(1)}`]}`}>
+                {getPriorityText(selectedSchedule.priority)}
+              </span>
+            </div>
+            
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>状态</div>
+              <div style={{ fontSize: 14 }}>{getStatusText(selectedSchedule.status)}</div>
+            </div>
+            
+            {selectedSchedule.description && (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>描述</div>
+                <div style={{ fontSize: 14, lineHeight: 1.6, padding: 12, background: 'rgba(0,0,0,0.02)', borderRadius: 8 }}>
+                  {selectedSchedule.description}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
+      </div>
+    </ConfigProvider>
   );
 };
 

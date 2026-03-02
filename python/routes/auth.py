@@ -83,21 +83,31 @@ def update_user(user_id):
     if not user:
         return jsonify({'error': 'User not found'}), 404
     
-    data = request.get_json()
-    
-    if 'nickname' in data:
-        user.nickname = data['nickname']
-    if 'avatar' in data:
-        user.avatar = data['avatar']
-    if 'bio' in data:
-        user.bio = data['bio']
-    if 'language' in data:
-        user.language = data['language']
-    if 'theme' in data:
-        user.theme = data['theme']
-    
-    db.session.commit()
-    return jsonify({'message': 'User updated successfully', 'user': user.to_dict()}), 200
+    try:
+        data = request.get_json()
+        print(f"[DEBUG] 更新用户信息 - 用户ID: {user_id}, 数据: {data}")
+        
+        if 'nickname' in data:
+            user.nickname = data['nickname']
+        if 'avatar' in data:
+            user.avatar = data['avatar']
+            print(f"[DEBUG] 更新头像 - 头像数据长度: {len(data['avatar']) if data['avatar'] else 0}")
+        if 'bio' in data:
+            user.bio = data['bio']
+        if 'language' in data:
+            user.language = data['language']
+        if 'theme' in data:
+            user.theme = data['theme']
+        
+        db.session.commit()
+        print(f"[DEBUG] 用户信息更新成功")
+        return jsonify({'message': 'User updated successfully', 'user': user.to_dict()}), 200
+    except Exception as e:
+        db.session.rollback()
+        print(f"[ERROR] 更新用户信息失败: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'更新失败: {str(e)}'}), 500
 
 @auth_bp.route('/change-password', methods=['POST'])
 @token_required

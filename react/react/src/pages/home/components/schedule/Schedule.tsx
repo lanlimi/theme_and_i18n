@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from "react";
-import { Button, Input, List, Card, Modal, Form, Select, message, Spin, DatePicker, Pagination, Checkbox } from 'antd';
+import { Button, Input, List, Card, Modal, Form, Select, message, Spin, DatePicker, Pagination, Checkbox, ConfigProvider } from 'antd';
+import zhCN from 'antd/locale/zh_CN';
 import type { InputRef } from 'antd';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
@@ -68,8 +69,8 @@ const ScheduleManage: React.FC = () => {
             const { timeRange, ...rest } = values;
             const createData: CreateScheduleRequest = {
                 ...rest,
-                start_time: timeRange[0].toISOString(),
-                end_time: timeRange[1].toISOString()
+                start_time: timeRange[0].format('YYYY-MM-DD HH:mm:ss'),
+                end_time: timeRange[1].format('YYYY-MM-DD HH:mm:ss')
             };
             await scheduleApi.createSchedule(createData);
             message.success('创建日程成功');
@@ -89,8 +90,8 @@ const ScheduleManage: React.FC = () => {
             const { timeRange, ...rest } = values;
             const updateData: UpdateScheduleRequest = {
                 ...rest,
-                start_time: timeRange[0].toISOString(),
-                end_time: timeRange[1].toISOString()
+                start_time: timeRange[0].format('YYYY-MM-DD HH:mm:ss'),
+                end_time: timeRange[1].format('YYYY-MM-DD HH:mm:ss')
             };
             await scheduleApi.updateSchedule(editingSchedule.id, updateData);
             message.success('更新日程成功');
@@ -141,6 +142,12 @@ const ScheduleManage: React.FC = () => {
         setIsEditModalVisible(true);
     };
 
+    // 打开创建日程模态框
+    const handleOpenCreateModal = () => {
+        form.resetFields();
+        setIsCreateModalVisible(true);
+    };
+
     // 切换选择状态
     const toggleSelect = (id: number) => {
         if (selectedSchedules.includes(id)) {
@@ -176,13 +183,14 @@ const ScheduleManage: React.FC = () => {
     };
 
     return (
-        <div className={styles.scheduleContainer}>
+        <ConfigProvider locale={zhCN}>
+            <div className={styles.scheduleContainer}>
             {/* 操作区 */}
             <div className={styles.operationArea}>
                 <Button 
                     type="primary" 
                     icon={<PlusOutlined />}
-                    onClick={() => setIsCreateModalVisible(true)}
+                    onClick={handleOpenCreateModal}
                 >
                     创建日程
                 </Button>
@@ -363,7 +371,11 @@ const ScheduleManage: React.FC = () => {
             <Modal
                 title="编辑日程"
                 open={isEditModalVisible}
-                onCancel={() => setIsEditModalVisible(false)}
+                onCancel={() => {
+                    setIsEditModalVisible(false);
+                    setEditingSchedule(null);
+                    form.resetFields();
+                }}
                 footer={null}
             >
                 <Form
@@ -425,7 +437,8 @@ const ScheduleManage: React.FC = () => {
                     </Form.Item>
                 </Form>
             </Modal>
-        </div>
+            </div>
+        </ConfigProvider>
     );
 };
 

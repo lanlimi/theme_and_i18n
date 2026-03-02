@@ -3,6 +3,7 @@ import { Input, Button, Card, message, Tabs } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { authApi } from '@/api';
 import { useNavigate } from 'react-router-dom';
+import userInfoStore from '@/stores/userInfo';
 
 const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -25,6 +26,17 @@ const Login: React.FC = () => {
       const response: any = await authApi.login({ username: loginUsername, password: loginPassword });
       localStorage.setItem('token', response?.token);
       localStorage.setItem('user', JSON.stringify(response.user));
+      
+      // 将用户信息存储到userInfoStore
+      userInfoStore.setUserInfo({
+        id: response.user.id.toString(),
+        name: response.user.nickname || response.user.username,
+        avatar: response.user.avatar || '',
+        email: response.user.email,
+        phone: '',
+        role: 'user'
+      });
+      
       message.success('登录成功');
       navigate('/home');
     } catch (error: any) {

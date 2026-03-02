@@ -5,7 +5,6 @@ import { ContainerOutlined, DesktopOutlined, PieChartOutlined, UploadOutlined, U
 import { Flex, Layout, Menu, Segmented, theme, type MenuProps } from 'antd';
 import Sider from 'antd/es/layout/Sider';
 import { Content, Footer, Header } from 'antd/es/layout/layout';
-import Test from "./components/homePage/test";
 import ScheduleManage from "./components/schedule/Schedule.tsx";
 import ScheduleSubscribe from "./components/subscribe/scheduleSubscribe.tsx"
 import Setting from "./components/setting/setting.tsx";

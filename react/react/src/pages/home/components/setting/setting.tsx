@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Button, Card, Input, Select, Avatar, Upload, message, Spin, Modal, Form } from 'antd';
-import { UserOutlined, EditOutlined, LockOutlined, SaveOutlined } from '@ant-design/icons';
+import { UserOutlined, EditOutlined, LockOutlined, SaveOutlined, UploadOutlined } from '@ant-design/icons';
 import useStyles from './style/index.ts';
 import { authApi, type User } from '@/api';
+import type { UploadFile, UploadProps } from 'antd/es/upload';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -74,6 +75,57 @@ const Setting: React.FC = () => {
         }
     };
 
+    // 上传前校验
+    const beforeUpload = (file: File) => {
+        const isImage = file.type.startsWith('image/');
+        if (!isImage) {
+            message.error('只能上传图片文件！');
+            return Upload.LIST_IGNORE;
+        }
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isLt2M) {
+            message.error('图片大小不能超过 2MB！');
+            return Upload.LIST_IGNORE;
+        }
+        return true;
+    };
+
+    // 自定义上传头像
+    const handleAvatarUpload = async (options: any) => {
+        const { file, onSuccess, onError } = options;
+        
+        try {
+            setLoading(true);
+            // 将图片转为 Base64
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                const base64Url = reader.result as string;
+                try {
+                    // 调用更新用户接口保存头像
+                    await authApi.updateUser({ avatar: base64Url });
+                    message.success('头像上传成功');
+                    setUser({ ...user!, avatar: base64Url });
+                    onSuccess?.('ok');
+                } catch (error: any) {
+                    message.error(error.response?.data?.error || '头像上传失败');
+                    onError?.(error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+            reader.onerror = (error) => {
+                message.error('图片读取失败');
+                onError?.(error);
+                setLoading(false);
+            };
+        } catch (error: any) {
+            message.error('头像上传失败');
+            onError?.(error);
+            setLoading(false);
+        }
+    };
+
     if (loading && !user) {
         return (
             <div className={styles.settingContainer}>
@@ -120,10 +172,18 @@ const Setting: React.FC = () => {
                                 />
                                 {editing && (
                                     <div className={styles.avatarUpload}>
-                                        <Upload.Dragger name="avatar" action="/api/upload" accept="image/*">
-                                            <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
-                                            <p className="ant-upload-hint">支持 JPG、PNG 等格式，最大 2MB</p>
-                                        </Upload.Dragger>
+                                        <Upload
+                                            name="avatar"
+                                            accept="image/*"
+                                            showUploadList={false}
+                                            beforeUpload={beforeUpload}
+                                            customRequest={handleAvatarUpload}
+                                        >
+                                            <Button icon={<UploadOutlined />}>点击上传头像</Button>
+                                        </Upload>
+                                        <p className="ant-upload-hint" style={{ marginTop: 8, fontSize: 12, color: '#999' }}>
+                                            支持 JPG、PNG 等格式，最大 2MB
+                                        </p>
                                     </div>
                                 )}
                             </div>
