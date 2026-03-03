@@ -11,7 +11,7 @@ export default customCreateStyles(({ token, css }) => ({
     
     searchArea: css`
         height: 80px;
-        background: ${token.colorHeader};
+        background: linear-gradient(135deg, ${token.colorHeader}, ${token.colorBgContainer});
         display: flex;
         align-items: center;
         padding: 0 24px;

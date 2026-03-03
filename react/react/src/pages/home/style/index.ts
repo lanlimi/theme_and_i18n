@@ -28,12 +28,36 @@ export default customCreateStyles(({ token, css }) => {
       }
 
       .siderStyle{
-        width: 20%;
+        width: ${token.siderStyleWidth}px !important;
         background: ${token.colorBgContainer};
+        flex: 1 !important;
+        min-width: ${token.siderStyleWidth}px !important;
       }
 
       .ant-menu {
-        backgound: ${token.colorBgContainer}
+        backgound: ${token.colorTextSecondary} !important;
+      }
+
+      .MenuStyle {
+        background: ${token.colorBgContainer} !important;
+        
+        
+        .ant-menu {
+          background: ${token.colorBgContainer} !important;
+        }
+
+        .ant-menu-item {
+          color: ${token.colorText} !important;
+        }
+
+        .ant-menu-item-selected {
+          background: ${token.colorTextSecondary} !important;
+          color: #ffffff !important;
+        }
+
+        .ant-menu-item:hover {
+          background: ${token.colorTextSecondary} !important;
+        }
       }
   `,
   }

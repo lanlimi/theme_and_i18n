@@ -99,6 +99,7 @@
   "combinationCabinetWidth": 240,
   "colorImgSize": 48,
   "colorImgPadding": 4,
-  "AIWriteBtnWidth": 120
-
+  "AIWriteBtnWidth": 120,
+  "sidePanelWidth": 320,
+  "siderStyleWidth": 200
 }

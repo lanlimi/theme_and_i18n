@@ -29,8 +29,9 @@ function App() {
   const urlParams = new URLSearchParams(window.location.search);
   const locale = urlParams.get('locale');
   useEffect(() => {
+    console.log('使用的语言包是', locale)
     if (locale) {
-      loadLanguageAsync(locale);
+      loadLanguageAsync("en");     
     }
   }, [locale]);
 

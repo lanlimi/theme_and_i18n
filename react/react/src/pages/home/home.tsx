@@ -8,6 +8,7 @@ import { Content, Footer, Header } from 'antd/es/layout/layout';
 import ScheduleManage from "./components/schedule/Schedule.tsx";
 import ScheduleSubscribe from "./components/subscribe/scheduleSubscribe.tsx"
 import Setting from "./components/setting/setting.tsx";
+import { useTranslation } from "@/i18n/index.ts";
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -21,6 +22,7 @@ const items: MenuItem[] = [
 
 const Home = () => {
     const { styles } = useStyles();
+    const { t } = useTranslation();
     const [collapsed, setCollapsed] = useState(false);
     const [showMenu, setShowMenu] = useState<string>('1');
 
@@ -34,7 +36,7 @@ const Home = () => {
             <Layout className='LayoutStyle'>
                 <Sider className="siderStyle">
                     <div className="titleBox">
-                        让每天都变的高效和愉快！
+                        {t("让每天都变的高效和愉快！")}
                     </div>
                     <Menu
                         // defaultSelectedKeys={['1']}
@@ -44,6 +46,7 @@ const Home = () => {
                         inlineCollapsed={collapsed}
                         items={items}
                         onSelect={(item) => setShowMenu(item.key)}
+                        className="MenuStyle"
                     />
                 </Sider>
                 {showMenu === '1' && <HomePage setShowMenu={setShowMenu} />}

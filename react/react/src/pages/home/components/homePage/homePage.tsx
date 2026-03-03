@@ -11,6 +11,7 @@ import type { Dayjs } from 'dayjs';
 import appStore from '@/stores/appStore';
 import themeStore from '@/stores/theme';
 import { toJS } from 'mobx';
+import { useTranslation } from '@/i18n';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -23,6 +24,8 @@ const HomePage: React.FC<HomePageProps> = ({
   setShowMenu,
 }) => {
   const { styles } = useStyles();
+  const { t } = useTranslation();
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewType, setViewType] = useState<'week' | 'month'>('week');
   const [schedules, setSchedules] = useState<Schedule[]>([]);

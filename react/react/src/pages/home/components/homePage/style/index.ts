@@ -384,7 +384,7 @@ export default customCreateStyles(({ token, css }) => ({
 
     // 右下快捷信息区
     sidePanel: css`
-        width: 320px;
+        width: ${token.sidePanelWidth}px;
         display: flex;
         flex-direction: column;
         gap: 20px;
