@@ -36,7 +36,7 @@ const Home = () => {
             <Layout className='LayoutStyle'>
                 <Sider className="siderStyle">
                     <div className="titleBox">
-                        {t("让每天都变的高效和愉快！")}
+                        {t("让每天都变的高效和愉快")}！
                     </div>
                     <Menu
                         // defaultSelectedKeys={['1']}

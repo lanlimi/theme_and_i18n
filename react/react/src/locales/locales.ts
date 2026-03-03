@@ -12,7 +12,7 @@ const loadLanguageAsync = (locale: string) => {
         i18n.changeLanguage("zh_CN");
         return;
     }
-    
+    console.log('切换语言包', normalizedLocale)
     // 切换i18n语言
     i18n.changeLanguage(normalizedLocale);
 }

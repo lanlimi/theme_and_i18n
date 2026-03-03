@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import './App.css'
-import { Route, Routes, Navigate, BrowserRouter } from "react-router-dom";
+import { Route, Routes, Navigate, BrowserRouter, useLocation } from "react-router-dom";
 import { I18nextProvider } from 'react-i18next';
 import { ThemeProvider } from 'antd-style';
 import { ConfigProvider, message } from 'antd';
@@ -16,6 +16,7 @@ import appStore from './stores/appStore';
 import { debounce } from 'lodash-es';
 import { observer } from 'mobx-react-lite';
 import userInfoStore from './stores/userInfo';
+import { getBrowserLang } from './utils/getBrowserLang';
 
 // 1、优先完成国际化配置
 // 2、阿里icon组件（可变色icon和彩色icon）配置
@@ -26,14 +27,26 @@ function App() {
   const Home = lazy(() => import('@/pages/home/home.tsx'))
   const Login = lazy(() => import('@/pages/login/login.tsx'))
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const locale = urlParams.get('locale');
+
+  const location  = window.location.href.split('?')
+  const language: any = localStorage.getItem('i18n_Language');
+
   useEffect(() => {
-    console.log('使用的语言包是', locale)
-    if (locale) {
-      loadLanguageAsync("en");     
+    if (language) {
+      loadLanguageAsync(language);
     }
-  }, [locale]);
+    else if (location && location[1].includes('locale')) {
+      const debuggerLan = location[1].split('=')[1]
+      loadLanguageAsync(debuggerLan);
+    }
+    else {
+      const browserLanguage = getBrowserLang()
+      loadLanguageAsync(browserLanguage);
+    }
+    
+    console.log('url参数', location)
+    console.log('浏览器语言', language)
+  }, []);
 
 
 

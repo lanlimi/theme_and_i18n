@@ -197,49 +197,55 @@ const Setting: React.FC = () => {
                                 )}
                             </div>
                             
-                            {/* 个人信息 */}
-                            <div className={styles.infoGrid}>
-                                <div className={styles.infoItem}>
-                                    <div className={styles.label}>账号ID</div>
-                                    <div className={styles.value}>{user.id}</div>
+                            {/* 编辑表单 */}
+                            <Form
+                                form={form}
+                                onFinish={handleSaveUserInfo}
+                                className={styles.editForm}
+                            >
+                                <div className={styles.infoGrid}>
+                                    <div className={styles.infoItem}>
+                                        <div className={styles.label}>账号ID</div>
+                                        <div className={styles.value}>{user.id}</div>
+                                    </div>
+                                    
+                                    <div className={styles.infoItem}>
+                                        <div className={styles.label}>用户名</div>
+                                        <div className={styles.value}>{user.username}</div>
+                                    </div>
+                                    
+                                    <div className={styles.infoItem}>
+                                        <div className={styles.label}>邮箱</div>
+                                        <div className={styles.value}>{user.email}</div>
+                                    </div>
+                                    
+                                    <div className={styles.infoItem}>
+                                        <div className={styles.label}>昵称</div>
+                                        {editing ? (
+                                            <Form.Item name="nickname" noStyle>
+                                                <Input className={styles.input} placeholder="请输入昵称" />
+                                            </Form.Item>
+                                        ) : (
+                                            <div className={styles.value}>{user.nickname || '未设置'}</div>
+                                        )}
+                                    </div>
+                                    
+                                    <div className={styles.infoItem}>
+                                        <div className={styles.label}>个人简介</div>
+                                        {editing ? (
+                                            <Form.Item name="bio" noStyle>
+                                                <TextArea className={styles.textArea} placeholder="请输入个人简介" />
+                                            </Form.Item>
+                                        ) : (
+                                            <div className={styles.value}>{user.bio || '未设置'}</div>
+                                        )}
+                                    </div>
                                 </div>
-                                
-                                <div className={styles.infoItem}>
-                                    <div className={styles.label}>用户名</div>
-                                    <div className={styles.value}>{user.username}</div>
-                                </div>
-                                
-                                <div className={styles.infoItem}>
-                                    <div className={styles.label}>邮箱</div>
-                                    <div className={styles.value}>{user.email}</div>
-                                </div>
-                                
-                                <div className={styles.infoItem}>
-                                    <div className={styles.label}>昵称</div>
-                                    {editing ? (
-                                        <Form.Item name="nickname" noStyle>
-                                            <Input className={styles.input} placeholder="请输入昵称" />
-                                        </Form.Item>
-                                    ) : (
-                                        <div className={styles.value}>{user.nickname || '未设置'}</div>
-                                    )}
-                                </div>
-                                
-                                <div className={styles.infoItem}>
-                                    <div className={styles.label}>个人简介</div>
-                                    {editing ? (
-                                        <Form.Item name="bio" noStyle>
-                                            <TextArea className={styles.textArea} placeholder="请输入个人简介" />
-                                        </Form.Item>
-                                    ) : (
-                                        <div className={styles.value}>{user.bio || '未设置'}</div>
-                                    )}
-                                </div>
-                            </div>
+                            </Form>
                             
                             {/* 语言和主题设置 */}
                             <div className={styles.infoGrid}>
-                                <div className={styles.infoItem}>
+                                {/* <div className={styles.infoItem}>
                                     <div className={styles.label}>语言设置</div>
                                     {editing ? (
                                         <Form.Item name="language" noStyle>
@@ -251,7 +257,7 @@ const Setting: React.FC = () => {
                                     ) : (
                                         <div className={styles.value}>{user.language === 'zh-CN' ? '中文' : 'English'}</div>
                                     )}
-                                </div>
+                                </div> */}
                                 
                                 {/* <div className={styles.infoItem}>
                                     <div className={styles.label}>主题偏好</div>
@@ -372,12 +378,6 @@ const Setting: React.FC = () => {
                 </Form>
             </Modal>
             
-            {/* 编辑表单 */}
-            <Form
-                form={form}
-                onFinish={handleSaveUserInfo}
-                style={{ display: 'none' }}
-            />
         </div>
     );
 };
