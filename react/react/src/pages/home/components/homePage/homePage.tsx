@@ -216,7 +216,7 @@ const HomePage: React.FC<HomePageProps> = ({
   };
 
   const formatDate = (dateObj: Date) => {
-    return `${dateObj.getMonth() + 1}月${dateObj.getDate()}日`;
+    return `${dateObj.getMonth() + 1}${t("月")}${dateObj.getDate()}${t("日")}`;
   };
 
   const getPriorityText = (priority: string) => {
@@ -259,7 +259,7 @@ const HomePage: React.FC<HomePageProps> = ({
               icon={<CalendarOutlined />}
             />
             <div className={styles.userInfoText}>
-              <div className={styles.userName}>{userInfo.name || '用户'}</div>
+              <div className={styles.userName}>{userInfo.name || t('用户')}</div>
               <div className={styles.userEmail}>{userInfo.email}</div>
             </div>
           </div>
@@ -267,7 +267,7 @@ const HomePage: React.FC<HomePageProps> = ({
         <div className={styles.headerRight}>
           <Segmented 
             value={viewType}
-            options={[{ value: 'week', label: '周视图' }, { value: 'month', label: '月视图' }]}
+            options={[{ value: 'week', label: t('周视图') }, { value: 'month', label: t('月视图') }]}
             onChange={(value) => handleViewChange(value as 'week' | 'month')}
           />
           <Segmented
@@ -299,13 +299,13 @@ const HomePage: React.FC<HomePageProps> = ({
                 <LeftOutlined />
               </button>
               <div className={styles.dateDisplay}>
-                {year}年{month}月
+                {year}{t("年")}{month}{t("月")}
               </div>
               <button className={styles.navButton} onClick={handleNextMonth}>
                 <RightOutlined />
               </button>
               <button className={styles.todayButton} onClick={handleToday}>
-                今天
+                {t("今天")}
               </button>
             </div>
           </div>
@@ -317,7 +317,7 @@ const HomePage: React.FC<HomePageProps> = ({
                 <div className={styles.weekdayHeader}>
                   {weekdayNames.map(day => (
                     <div key={day} className={styles.weekdayItem}>
-                      {day}
+                      {t(day)}
                     </div>
                   ))}
                 </div>
@@ -345,7 +345,7 @@ const HomePage: React.FC<HomePageProps> = ({
                           ))}
                           {daySchedules.length > 3 && (
                             <div className={styles.moreSchedules}>
-                              +{daySchedules.length - 3}更多
+                              +{daySchedules.length - 3}{t("更多")}
                             </div>
                           )}
                         </div>
@@ -378,7 +378,7 @@ const HomePage: React.FC<HomePageProps> = ({
                         {daySchedules.length === 0 ? (
                           <div className={styles.emptyState}>
                             <div className={styles.emptyIcon}>📅</div>
-                            <div>无日程</div>
+                            <div>{t('无日程')}</div>
                           </div>
                         ) : (
                           daySchedules.map(schedule => (
@@ -411,13 +411,13 @@ const HomePage: React.FC<HomePageProps> = ({
           {/* 上半部分：今日所有日程 */}
           <div className={styles.todaySection}>
             <div className={styles.sideSectionTitle}>
-              <ClockCircleOutlined /> 今日日程
+              <ClockCircleOutlined /> {t('今日日程')}
             </div>
             <div className={styles.scheduleList}>
               {getTodaySchedules().length === 0 ? (
                 <div className={styles.emptyState}>
                   <div className={styles.emptyIcon}>📋</div>
-                  <div>今日暂无日程</div>
+                  <div>{t('今日暂无日程')}</div>
                 </div>
               ) : (
                 getTodaySchedules().map(schedule => (
@@ -442,7 +442,7 @@ const HomePage: React.FC<HomePageProps> = ({
           {/* 下半部分：下一个高优先级日程 */}
           <div className={styles.prioritySection}>
             <div className={styles.sideSectionTitle}>
-              <CalendarOutlined /> 重要日程
+              <CalendarOutlined /> {t('重要日程')}
             </div>
             {getNextHighPrioritySchedule() ? (
               <div 
@@ -465,7 +465,7 @@ const HomePage: React.FC<HomePageProps> = ({
             ) : (
               <div className={styles.emptyState}>
                 <div className={styles.emptyIcon}>⭐</div>
-                <div>暂无高优先级日程</div>
+                <div>{t("暂无高优先级日程")}</div>
               </div>
             )}
           </div>
@@ -473,7 +473,7 @@ const HomePage: React.FC<HomePageProps> = ({
       </div>
 
       <Modal
-        title={`${selectedDate ? formatDate(selectedDate) : ''}的日程`}
+        title={`${selectedDate ? formatDate(selectedDate) : ''}${t("的日程")}`}
         open={dayModalVisible}
         onCancel={() => setDayModalVisible(false)}
         footer={null}
@@ -483,7 +483,7 @@ const HomePage: React.FC<HomePageProps> = ({
           {daySchedules.length === 0 ? (
             <div className={styles.emptyState}>
               <div className={styles.emptyIcon}>📅</div>
-              <div>暂无日程</div>
+              <div>{t('暂无日程')}</div>
             </div>
           ) : (
             <div className={styles.modalScheduleList}>
@@ -527,13 +527,13 @@ const HomePage: React.FC<HomePageProps> = ({
             }}
             className={styles.createButton}
           >
-            新建日程
+            {t("新建日程")}
           </Button>
         </div>
       </Modal>
 
       <Modal
-        title="创建日程"
+        title={t("创建日程")}
         open={createModalVisible}
         onCancel={() => setCreateModalVisible(false)}
         footer={null}
@@ -546,21 +546,21 @@ const HomePage: React.FC<HomePageProps> = ({
         >
           <Form.Item
             name="title"
-            label="标题"
-            rules={[{ required: true, message: '请输入标题' }]}
+            label={t("标题")}
+            rules={[{ required: true, message: t('请输入标题') }]}
           >
-            <Input placeholder="请输入日程标题" />
+            <Input placeholder={t("请输入日程标题")} />
           </Form.Item>
           <Form.Item
             name="description"
-            label="描述"
+            label={t("描述")}
           >
-            <Input.TextArea placeholder="请输入日程描述" rows={3} />
+            <Input.TextArea placeholder={t("请输入日程描述")} rows={3} />
           </Form.Item>
           <Form.Item
             name="timeRange"
-            label="时间范围"
-            rules={[{ required: true, message: '请选择时间范围' }]}
+            label={t("时间范围")}
+            rules={[{ required: true, message: t('请选择时间范围') }]}
           >
             <RangePicker 
               showTime 
@@ -570,32 +570,32 @@ const HomePage: React.FC<HomePageProps> = ({
           </Form.Item>
           <Form.Item
             name="priority"
-            label="优先级"
+            label={t("优先级")}
             initialValue="medium"
           >
             <Select>
-              <Option value="high">高</Option>
-              <Option value="medium">中</Option>
-              <Option value="low">低</Option>
+              <Option value="high">{t("高")}</Option>
+              <Option value="medium">{t("中")}</Option>
+              <Option value="low">{t("低")}</Option>
             </Select>
           </Form.Item>
           <Form.Item
             name="status"
-            label="状态"
+            label={t("状态")}
             initialValue="pending"
           >
             <Select>
-              <Option value="pending">待处理</Option>
-              <Option value="in_progress">进行中</Option>
-              <Option value="completed">已完成</Option>
+              <Option value="pending">{t("待处理")}</Option>
+              <Option value="in_progress">{t("进行中")}</Option>
+              <Option value="completed">{t("已完成")}</Option>
             </Select>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" style={{ marginRight: 8 }} loading={loading}>
-              确定
+              {t("确定")}
             </Button>
             <Button onClick={() => setCreateModalVisible(false)}>
-              取消
+              {t("取消")}
             </Button>
           </Form.Item>
         </Form>
@@ -603,12 +603,12 @@ const HomePage: React.FC<HomePageProps> = ({
 
       {/* 日程详情弹窗 */}
       <Modal
-        title="日程详情"
+        title={t("日程详情")}
         open={scheduleDetailModalVisible}
         onCancel={() => setScheduleDetailModalVisible(false)}
         footer={[
           <Button key="close" onClick={() => setScheduleDetailModalVisible(false)}>
-            关闭
+            {t("关闭")}
           </Button>
         ]}
         width={500}
@@ -616,33 +616,33 @@ const HomePage: React.FC<HomePageProps> = ({
         {selectedSchedule && (
           <div className={styles.modalContent}>
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>标题</div>
-              <div style={{ fontSize: 16, fontWeight: 600 }}>{selectedSchedule.title}</div>
+              <div className={styles.modalTextStyle}>{t("标题")}</div>
+              <div className={styles.infoTextStyle}>{selectedSchedule.title}</div>
             </div>
             
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>时间</div>
-              <div style={{ fontSize: 14 }}>
+              <div className={styles.modalTextStyle}>{t("时间")}</div>
+              <div className={styles.infoTextStyle}>
                 <ClockCircleOutlined style={{ marginRight: 8 }} />
                 {formatDate(new Date(selectedSchedule.start_time))} {formatTime(selectedSchedule.start_time)} - {formatTime(selectedSchedule.end_time)}
               </div>
             </div>
             
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>优先级</div>
+              <div className={styles.modalTextStyle}>优先级</div>
               <span className={`${styles.scheduleCardPriority} ${styles[`priority${selectedSchedule.priority.charAt(0).toUpperCase() + selectedSchedule.priority.slice(1)}`]}`}>
                 {getPriorityText(selectedSchedule.priority)}
               </span>
             </div>
             
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>状态</div>
-              <div style={{ fontSize: 14 }}>{getStatusText(selectedSchedule.status)}</div>
+              <div className={styles.modalTextStyle}>{t("状态")}</div>
+              <div className={styles.infoTextStyle}>{getStatusText(selectedSchedule.status)}</div>
             </div>
             
             {selectedSchedule.description && (
               <div style={{ marginBottom: 16 }}>
-                <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>描述</div>
+                <div className={styles.modalTextStyle}>{t("描述")}</div>
                 <div style={{ fontSize: 14, lineHeight: 1.6, padding: 12, background: 'rgba(0,0,0,0.02)', borderRadius: 8 }}>
                   {selectedSchedule.description}
                 </div>

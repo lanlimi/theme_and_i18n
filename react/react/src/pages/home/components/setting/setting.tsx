@@ -5,12 +5,14 @@ import useStyles from './style/index.ts';
 import { authApi, type User } from '@/api';
 import type { UploadFile, UploadProps } from 'antd/es/upload';
 import userInfoStore from "@/stores/userInfo.ts";
+import { useTranslation } from "@/i18n/index.ts";
 
-const { Option } = Select;
 const { TextArea } = Input;
 
 const Setting: React.FC = () => {
     const { styles } = useStyles();
+    const { t } = useTranslation();
+    
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(false);
     const [editing, setEditing] = useState(false);
@@ -32,7 +34,7 @@ const Setting: React.FC = () => {
                 theme: userData.user.theme
             });
         } catch (error: any) {
-            message.error(error.response?.data?.error || '获取用户信息失败');
+            message.error(error.response?.data?.error || t('获取用户信息失败'));
         } finally {
             setLoading(false);
         }
@@ -52,7 +54,7 @@ const Setting: React.FC = () => {
             setEditing(false);
             fetchUserInfo();
         } catch (error: any) {
-            message.error(error.response?.data?.error || '保存失败');
+            message.error(error.response?.data?.error || t('保存失败'));
         } finally {
             setLoading(false);
         }
@@ -66,11 +68,11 @@ const Setting: React.FC = () => {
                 old_password: values.oldPassword,
                 new_password: values.newPassword
             });
-            message.success('密码修改成功');
+            message.success(t('密码修改成功'));
             setPasswordModalVisible(false);
             passwordForm.resetFields();
         } catch (error: any) {
-            message.error(error.response?.data?.error || '密码修改失败');
+            message.error(error.response?.data?.error || t('密码修改失败'));
         } finally {
             setLoading(false);
         }
@@ -80,12 +82,12 @@ const Setting: React.FC = () => {
     const beforeUpload = (file: File) => {
         const isImage = file.type.startsWith('image/');
         if (!isImage) {
-            message.error('只能上传图片文件！');
+            message.error(t('只能上传图片文件！'));
             return Upload.LIST_IGNORE;
         }
         const isLt2M = file.size / 1024 / 1024 < 2;
         if (!isLt2M) {
-            message.error('图片大小不能超过 2MB！');
+            message.error(t('图片大小不能超过 2MB！'));
             return Upload.LIST_IGNORE;
         }
         return true;
@@ -105,7 +107,7 @@ const Setting: React.FC = () => {
                 try {
                     // 调用更新用户接口保存头像
                     await authApi.updateUser({ avatar: base64Url });
-                    message.success('头像上传成功');
+                    message.success(t('头像上传成功'));
                     setUser({ ...user!, avatar: base64Url });
                     userInfoStore.setUserInfo({
                         id: user?.id.toString() as any,
@@ -117,19 +119,19 @@ const Setting: React.FC = () => {
                     })
                     onSuccess?.('ok');
                 } catch (error: any) {
-                    message.error(error.response?.data?.error || '头像上传失败');
+                    message.error(error.response?.data?.error || t('头像上传失败'));
                     onError?.(error);
                 } finally {
                     setLoading(false);
                 }
             };
             reader.onerror = (error) => {
-                message.error('图片读取失败');
+                message.error(t('图片读取失败'));
                 onError?.(error);
                 setLoading(false);
             };
         } catch (error: any) {
-            message.error('头像上传失败');
+            message.error(t('头像上传失败'));
             onError?.(error);
             setLoading(false);
         }
@@ -138,7 +140,7 @@ const Setting: React.FC = () => {
     if (loading && !user) {
         return (
             <div className={styles.settingContainer}>
-                <div className={styles.header}>个人设置</div>
+                <div className={styles.header}>{t("个人设置")}</div>
                 <div className={styles.content}>
                     <div className={styles.loadingContainer}>
                         <Spin size="large" />
@@ -151,10 +153,10 @@ const Setting: React.FC = () => {
     if (!user) {
         return (
             <div className={styles.settingContainer}>
-                <div className={styles.header}>个人设置</div>
+                <div className={styles.header}>{t("个人设置")}</div>
                 <div className={styles.content}>
                     <div className={styles.loadingContainer}>
-                        <p>获取用户信息失败</p>
+                        <p>{t("获取用户信息失败")}</p>
                     </div>
                 </div>
             </div>
@@ -163,12 +165,12 @@ const Setting: React.FC = () => {
 
     return (
         <div className={styles.settingContainer}>
-            <div className={styles.header}>个人设置</div>
+            <div className={styles.header}>{t("个人设置")}</div>
             
             <div className={styles.content}>
                 {/* 个人信息卡片 */}
                 <Card className={styles.card}>
-                    <div className={styles.cardHeader}>个人信息</div>
+                    <div className={styles.cardHeader}>{t("个人信息")}</div>
                     <div className={styles.cardBody}>
                         <div className={styles.userInfoSection}>
                             {/* 头像 */}
@@ -188,10 +190,10 @@ const Setting: React.FC = () => {
                                             beforeUpload={beforeUpload}
                                             customRequest={handleAvatarUpload}
                                         >
-                                            <Button icon={<UploadOutlined />}>点击上传头像</Button>
+                                            <Button icon={<UploadOutlined />}>{t("点击上传头像")}</Button>
                                         </Upload>
                                         <p className="ant-upload-hint" style={{ marginTop: 8, fontSize: 12, color: '#999' }}>
-                                            支持 JPG、PNG 等格式，最大 2MB
+                                            {t("支持 JPG、PNG 等格式，最大 2MB")}
                                         </p>
                                     </div>
                                 )}
@@ -205,39 +207,39 @@ const Setting: React.FC = () => {
                             >
                                 <div className={styles.infoGrid}>
                                     <div className={styles.infoItem}>
-                                        <div className={styles.label}>账号ID</div>
+                                        <div className={styles.label}>{t("账号ID")}</div>
                                         <div className={styles.value}>{user.id}</div>
                                     </div>
                                     
                                     <div className={styles.infoItem}>
-                                        <div className={styles.label}>用户名</div>
+                                        <div className={styles.label}>{t("用户名")}</div>
                                         <div className={styles.value}>{user.username}</div>
                                     </div>
                                     
                                     <div className={styles.infoItem}>
-                                        <div className={styles.label}>邮箱</div>
+                                        <div className={styles.label}>{t("邮箱")}</div>
                                         <div className={styles.value}>{user.email}</div>
                                     </div>
                                     
                                     <div className={styles.infoItem}>
-                                        <div className={styles.label}>昵称</div>
+                                        <div className={styles.label}>{t("昵称")}</div>
                                         {editing ? (
                                             <Form.Item name="nickname" noStyle>
-                                                <Input className={styles.input} placeholder="请输入昵称" />
+                                                <Input className={styles.input} placeholder={t("请输入昵称")} />
                                             </Form.Item>
                                         ) : (
-                                            <div className={styles.value}>{user.nickname || '未设置'}</div>
+                                            <div className={styles.value}>{user.nickname || t('未设置')}</div>
                                         )}
                                     </div>
                                     
                                     <div className={styles.infoItem}>
-                                        <div className={styles.label}>个人简介</div>
+                                        <div className={styles.label}>{t("个人简介")}</div>
                                         {editing ? (
                                             <Form.Item name="bio" noStyle>
-                                                <TextArea className={styles.textArea} placeholder="请输入个人简介" />
+                                                <TextArea className={styles.textArea} placeholder={t("请输入个人简介")} />
                                             </Form.Item>
                                         ) : (
-                                            <div className={styles.value}>{user.bio || '未设置'}</div>
+                                            <div className={styles.value}>{user.bio || t('未设置')}</div>
                                         )}
                                     </div>
                                 </div>
@@ -284,7 +286,7 @@ const Setting: React.FC = () => {
                                             onClick={() => form.submit()}
                                             loading={loading}
                                         >
-                                            保存
+                                            {t("保存")}
                                         </Button>
                                         <Button 
                                             onClick={() => {
@@ -297,7 +299,7 @@ const Setting: React.FC = () => {
                                                 });
                                             }}
                                         >
-                                            取消
+                                            {t("取消")}
                                         </Button>
                                     </>
                                 ) : (
@@ -306,14 +308,14 @@ const Setting: React.FC = () => {
                                         icon={<EditOutlined />}
                                         onClick={() => setEditing(true)}
                                     >
-                                        修改信息
+                                        {t("修改信息")}
                                     </Button>
                                 )}
                                 <Button 
                                     icon={<LockOutlined />}
                                     onClick={() => setPasswordModalVisible(true)}
                                 >
-                                    修改密码
+                                    {t("修改密码")}
                                 </Button>
                             </div>
                         </div>
@@ -323,7 +325,7 @@ const Setting: React.FC = () => {
             
             {/* 密码修改模态框 */}
             <Modal
-                title="修改密码"
+                title={t("修改密码")}
                 open={passwordModalVisible}
                 onCancel={() => setPasswordModalVisible(false)}
                 footer={null}
@@ -337,42 +339,42 @@ const Setting: React.FC = () => {
                 >
                     <Form.Item
                         name="oldPassword"
-                        label="旧密码"
-                        rules={[{ required: true, message: '请输入旧密码' }]}
+                        label={t("旧密码")}
+                        rules={[{ required: true, message: t('请输入旧密码') }]}
                     >
-                        <Input.Password placeholder="请输入旧密码" />
+                        <Input.Password placeholder={t("请输入旧密码")} />
                     </Form.Item>
                     <Form.Item
                         name="newPassword"
-                        label="新密码"
-                        rules={[{ required: true, message: '请输入新密码' }]}
+                        label={t("新密码")}
+                        rules={[{ required: true, message: t('请输入新密码') }]}
                     >
-                        <Input.Password placeholder="请输入新密码" />
+                        <Input.Password placeholder={t("请输入新密码")} />
                     </Form.Item>
                     <Form.Item
                         name="confirmPassword"
-                        label="确认新密码"
+                        label={t("确认新密码")}
                         dependencies={['newPassword']}
                         rules={[
-                            { required: true, message: '请确认新密码' },
+                            { required: true, message: t('请确认新密码') },
                             ({ getFieldValue }) => ({
                                 validator(_, value) {
                                     if (!value || getFieldValue('newPassword') === value) {
                                         return Promise.resolve();
                                     }
-                                    return Promise.reject(new Error('两次输入的密码不一致'));
+                                    return Promise.reject(new Error(t('两次输入的密码不一致')));
                                 },
                             }),
                         ]}
                     >
-                        <Input.Password placeholder="请确认新密码" />
+                        <Input.Password placeholder={t("请确认新密码")} />
                     </Form.Item>
                     <Form.Item>
                         <Button type="primary" htmlType="submit" style={{ marginRight: 8 }} loading={loading}>
-                            确认修改
+                            {t("确认修改")}
                         </Button>
                         <Button onClick={() => setPasswordModalVisible(false)}>
-                            取消
+                            {t("取消")}
                         </Button>
                     </Form.Item>
                 </Form>

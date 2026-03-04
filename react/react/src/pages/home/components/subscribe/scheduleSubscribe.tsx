@@ -3,9 +3,12 @@ import { Button, Input, List, Card, Modal, message, Spin, Pagination } from 'ant
 import { SearchOutlined, CalendarOutlined } from '@ant-design/icons';
 import useStyles from './style/index.ts';
 import { scheduleTemplateApi, type ScheduleTemplate, type TemplateSchedule } from '@/api';
+import { useTranslation } from "@/i18n/index.ts";
 
 const ScheduleSubscribe: React.FC = () => {
     const { styles } = useStyles();
+    const { t } = useTranslation();
+    
     const [templates, setTemplates] = useState<ScheduleTemplate[]>([]);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
@@ -29,7 +32,7 @@ const ScheduleSubscribe: React.FC = () => {
             setTemplates(data.templates);
             setTotal(data.total);
         } catch (error: any) {
-            message.error(error.response?.data?.error || '获取模板失败');
+            message.error(error.response?.data?.error || t('获取模板失败'));
         } finally {
             setLoading(false);
         }
@@ -56,7 +59,7 @@ const ScheduleSubscribe: React.FC = () => {
             setTemplateSchedules(data.schedules);
             setModalVisible(true);
         } catch (error: any) {
-            message.error(error.response?.data?.error || '获取模板详情失败');
+            message.error(error.response?.data?.error || t('获取模板详情失败'));
         } finally {
             setLoading(false);
         }
@@ -69,10 +72,10 @@ const ScheduleSubscribe: React.FC = () => {
         setLoading(true);
         try {
             await scheduleTemplateApi.subscribeScheduleTemplate(selectedTemplate.id);
-            message.success(`成功订阅模板 "${selectedTemplate.title}"`);
+            message.success(`${t("成功订阅模板")} "${selectedTemplate.title}"`);
             setModalVisible(false);
         } catch (error: any) {
-            message.error(error.response?.data?.error || '订阅失败');
+            message.error(error.response?.data?.error || t('订阅失败'));
         } finally {
             setLoading(false);
         }
@@ -91,7 +94,7 @@ const ScheduleSubscribe: React.FC = () => {
             <div className={styles.searchArea}>
                 <Input 
                     className={styles.searchInput}
-                    placeholder="输入模板标题搜索" 
+                    placeholder={t("输入模板标题搜索")}
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
                     prefix={<SearchOutlined />}
@@ -102,7 +105,7 @@ const ScheduleSubscribe: React.FC = () => {
                     icon={<SearchOutlined />}
                     onClick={handleSearch}
                 >
-                    搜索
+                    {t("搜索")}
                 </Button>
             </div>
 
@@ -114,7 +117,7 @@ const ScheduleSubscribe: React.FC = () => {
                     </div>
                 ) : templates.length === 0 ? (
                     <div className={styles.emptyContainer}>
-                        <p>暂无日程模板</p>
+                        <p>{t("暂无日程模板")}</p>
                     </div>
                 ) : (
                     <>
@@ -130,7 +133,7 @@ const ScheduleSubscribe: React.FC = () => {
                                             onClick={() => handleViewTemplate(template)}
                                             icon={<CalendarOutlined />}
                                         >
-                                            查看详情
+                                            {t("查看详情")}
                                         </Button>
                                     ]}
                                 >
@@ -144,7 +147,7 @@ const ScheduleSubscribe: React.FC = () => {
                                     )}
                                     <div className={styles.templateFooter}>
                                         <div className={styles.templateMeta}>
-                                            创建时间：{new Date(template.created_at).toLocaleString()}
+                                            {t("创建时间：")}{new Date(template.created_at).toLocaleString()}
                                         </div>
                                     </div>
                                 </Card>
@@ -158,7 +161,7 @@ const ScheduleSubscribe: React.FC = () => {
                                 onChange={handlePageChange}
                                 showSizeChanger
                                 showQuickJumper
-                                showTotal={(total) => `共 ${total} 条`}
+                                showTotal={(total) => `${t("共")} ${total} ${t("条")}`}
                                 pageSizeOptions={['10', '20', '50', '100']}
                             />
                         </div>
@@ -168,12 +171,12 @@ const ScheduleSubscribe: React.FC = () => {
 
             {/* 模板详情模态框 */}
             <Modal
-                title={selectedTemplate?.title || "模板详情"}
+                title={selectedTemplate?.title || t("模板详情")}
                 open={modalVisible}
                 onCancel={() => setModalVisible(false)}
                 footer={[
                     <Button key="cancel" onClick={() => setModalVisible(false)}>
-                        取消
+                        {t("取消")}
                     </Button>,
                     <Button 
                         key="subscribe" 
@@ -181,7 +184,7 @@ const ScheduleSubscribe: React.FC = () => {
                         loading={loading}
                         onClick={handleSubscribe}
                     >
-                        订阅此模板
+                        {t("订阅此模板")}
                     </Button>
                 ]}
                 width={800}
@@ -198,9 +201,9 @@ const ScheduleSubscribe: React.FC = () => {
                             </div>
                         )}
                         <div style={{ marginTop: 24 }}>
-                            <h4>日程列表</h4>
+                            <h4>{t("日程列表")}</h4>
                             {templateSchedules.length === 0 ? (
-                                <p style={{ color: '#999', marginTop: 12 }}>暂无日程</p>
+                                <p style={{ color: '#999', marginTop: 12 }}>{t("暂无日程")}</p>
                             ) : (
                                 <List
                                     dataSource={templateSchedules}
@@ -212,10 +215,10 @@ const ScheduleSubscribe: React.FC = () => {
                                                     {new Date(schedule.start_time).toLocaleString()} - {new Date(schedule.end_time).toLocaleString()}
                                                 </span>
                                                 <span className={`${styles.priorityBadge} ${styles[`priority${schedule.priority.charAt(0).toUpperCase() + schedule.priority.slice(1)}`]}`}>
-                                                    {schedule.priority === 'high' ? '高' : schedule.priority === 'medium' ? '中' : '低'}优先级
+                                                    {schedule.priority === 'high' ? t('高') : schedule.priority === 'medium' ? t('中') : t('低')}{t("优先级")}
                                                 </span>
                                                 <span className={`${styles.statusBadge} ${styles[`status${schedule.status.charAt(0).toUpperCase() + schedule.status.slice(1)}`]}`}>
-                                                    {schedule.status === 'pending' ? '待处理' : schedule.status === 'in_progress' ? '进行中' : '已完成'}
+                                                    {schedule.status === 'pending' ? t('待处理') : schedule.status === 'in_progress' ? t('进行中') : t('已完成')}
                                                 </span>
                                             </div>
                                             {schedule.description && (

@@ -10,12 +10,15 @@ const { RangePicker } = DatePicker;
 import { PlusOutlined, SearchOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import useStyles from './style/index.ts';
 import { scheduleApi, type Schedule, type CreateScheduleRequest, type UpdateScheduleRequest } from '@/api';
+import { useTranslation } from "@/i18n/index.ts";
 
 const { Option } = Select;
 
 
 const ScheduleManage: React.FC = () => {
     const { styles } = useStyles();
+    const { t } = useTranslation();
+    
     const [schedules, setSchedules] = useState<Schedule[]>([]);
     const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState('');
@@ -192,7 +195,7 @@ const ScheduleManage: React.FC = () => {
                     icon={<PlusOutlined />}
                     onClick={handleOpenCreateModal}
                 >
-                    创建日程
+                    {t("创建日程")}
                 </Button>
                 <Button 
                     danger 
@@ -200,18 +203,18 @@ const ScheduleManage: React.FC = () => {
                     onClick={handleDelete}
                     disabled={selectedSchedules.length === 0}
                 >
-                    删除日程 ({selectedSchedules.length})
+                    {t("删除日程")} ({selectedSchedules.length})
                 </Button>
                 <Checkbox 
                     checked={isAllSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
                     disabled={schedules.length === 0}
                 >
-                    全选日程
+                    {t("全选日程")}
                 </Checkbox>
                 <div className={styles.searchArea}>
                     <Input 
-                        placeholder="输入日程标题搜索" 
+                        placeholder={t("输入日程标题搜索")} 
                         value={searchText}
                         onChange={(e) => setSearchText(e.target.value)}
                         style={{ width: 300, marginRight: 8 }}
@@ -220,7 +223,7 @@ const ScheduleManage: React.FC = () => {
                         icon={<SearchOutlined />}
                         onClick={handleSearch}
                     >
-                        查询
+                        {t("查询")}
                     </Button>
                 </div>
             </div>
@@ -233,7 +236,7 @@ const ScheduleManage: React.FC = () => {
                     </div>
                 ) : schedules.length === 0 ? (
                     <div className={styles.emptyContainer}>
-                        <p>暂无日程</p>
+                        <p>{t("暂无日程")}</p>
                     </div>
                 ) : (
                     <>
@@ -266,10 +269,10 @@ const ScheduleManage: React.FC = () => {
                                                     {new Date(schedule.start_time).toLocaleString()} - {new Date(schedule.end_time).toLocaleString()}
                                                 </span>
                                                 <span className={`${styles.priorityBadge} ${styles[`priority${schedule.priority.charAt(0).toUpperCase() + schedule.priority.slice(1)}`]}`}>
-                                                    {schedule.priority === 'high' ? '高' : schedule.priority === 'medium' ? '中' : '低'}优先级
+                                                    {schedule.priority === 'high' ? t('高') : schedule.priority === 'medium' ? t('中') : t('低')}{t("优先级")}
                                                 </span>
                                                 <span className={`${styles.statusBadge} ${styles[`status${schedule.status.charAt(0).toUpperCase() + schedule.status.slice(1)}`]}`}>
-                                                    {schedule.status === 'pending' ? '待处理' : schedule.status === 'in_progress' ? '进行中' : '已完成'}
+                                                    {schedule.status === 'pending' ? t('待处理') : schedule.status === 'in_progress' ? t('进行中') : t('已完成')}
                                                 </span>
                                             </div>
                                             {schedule.description && (
@@ -290,7 +293,7 @@ const ScheduleManage: React.FC = () => {
                                 onChange={handlePageChange}
                                 showSizeChanger
                                 showQuickJumper
-                                showTotal={(total) => `共 ${total} 条`}
+                                showTotal={(total) => `${t("共")} ${total} ${t("条")}`}
                                 pageSizeOptions={['10', '20', '50', '100']}
                             />
                         </div>
@@ -300,7 +303,7 @@ const ScheduleManage: React.FC = () => {
 
             {/* 创建日程模态框 */}
             <Modal
-                title="创建日程"
+                title={t("创建日程")}
                 open={isCreateModalVisible}
                 onCancel={() => setIsCreateModalVisible(false)}
                 footer={null}
@@ -312,21 +315,21 @@ const ScheduleManage: React.FC = () => {
                 >
                     <Form.Item
                         name="title"
-                        label="标题"
-                        rules={[{ required: true, message: '请输入标题' }]}
+                        label={t("标题")}
+                        rules={[{ required: true, message: t('请输入标题') }]}
                     >
-                        <Input placeholder="请输入日程标题" />
+                        <Input placeholder={t("请输入日程标题")} />
                     </Form.Item>
                     <Form.Item
                         name="description"
-                        label="描述"
+                        label={t("描述")}
                     >
-                        <TextArea placeholder="请输入日程描述" rows={3} />
+                        <TextArea placeholder={t("请输入日程描述")} rows={3} />
                     </Form.Item>
                     <Form.Item
                         name="timeRange"
-                        label="时间范围"
-                        rules={[{ required: true, message: '请选择时间范围' }]}
+                        label={t("时间范围")}
+                        rules={[{ required: true, message: t('请选择时间范围') }]}
                     >
                         <RangePicker 
                             showTime 
@@ -336,32 +339,32 @@ const ScheduleManage: React.FC = () => {
                     </Form.Item>
                     <Form.Item
                         name="priority"
-                        label="优先级"
+                        label={t("优先级")}
                         initialValue="medium"
                     >
                         <Select>
-                            <Option value="high">高</Option>
-                            <Option value="medium">中</Option>
-                            <Option value="low">低</Option>
+                            <Option value="high">{t("高")}</Option>
+                            <Option value="medium">{t("中")}</Option>
+                            <Option value="low">{t("低")}</Option>
                         </Select>
                     </Form.Item>
                     <Form.Item
                         name="status"
-                        label="状态"
+                        label={t("状态")}
                         initialValue="pending"
                     >
                         <Select>
-                            <Option value="pending">待处理</Option>
-                            <Option value="in_progress">进行中</Option>
-                            <Option value="completed">已完成</Option>
+                            <Option value="pending">{t("待处理")}</Option>
+                            <Option value="in_progress">{t("进行中")}</Option>
+                            <Option value="completed">{t("已完成")}</Option>
                         </Select>
                     </Form.Item>
                     <Form.Item>
                         <Button type="primary" htmlType="submit" style={{ marginRight: 8 }}>
-                            确定
+                            {t("确定")}
                         </Button>
                         <Button onClick={() => setIsCreateModalVisible(false)}>
-                            取消
+                            {t("取消")}
                         </Button>
                     </Form.Item>
                 </Form>
@@ -369,7 +372,7 @@ const ScheduleManage: React.FC = () => {
 
             {/* 编辑日程模态框 */}
             <Modal
-                title="编辑日程"
+                title={t("编辑日程")}
                 open={isEditModalVisible}
                 onCancel={() => {
                     setIsEditModalVisible(false);
@@ -385,21 +388,21 @@ const ScheduleManage: React.FC = () => {
                 >
                     <Form.Item
                         name="title"
-                        label="标题"
-                        rules={[{ required: true, message: '请输入标题' }]}
+                        label={t("标题")}
+                        rules={[{ required: true, message: t('请输入标题') }]}
                     >
-                        <Input placeholder="请输入日程标题" />
+                        <Input placeholder={t("请输入日程标题")} />
                     </Form.Item>
                     <Form.Item
                         name="description"
-                        label="描述"
+                        label={t("描述")}
                     >
-                        <TextArea placeholder="请输入日程描述" rows={3} />
+                        <TextArea placeholder={t("请输入日程描述")} rows={3} />
                     </Form.Item>
                     <Form.Item
                         name="timeRange"
-                        label="时间范围"
-                        rules={[{ required: true, message: '请选择时间范围' }]}
+                        label={t("时间范围")}
+                        rules={[{ required: true, message: t('请选择时间范围') }]}
                     >
                         <RangePicker 
                             showTime 
@@ -409,30 +412,30 @@ const ScheduleManage: React.FC = () => {
                     </Form.Item>
                     <Form.Item
                         name="priority"
-                        label="优先级"
+                        label={t("优先级")}
                     >
                         <Select>
-                            <Option value="high">高</Option>
-                            <Option value="medium">中</Option>
-                            <Option value="low">低</Option>
+                            <Option value="high">{t("高")}</Option>
+                            <Option value="medium">{t("中")}</Option>
+                            <Option value="low">{t("低")}</Option>
                         </Select>
                     </Form.Item>
                     <Form.Item
                         name="status"
-                        label="状态"
+                        label={t("状态")}
                     >
                         <Select>
-                            <Option value="pending">待处理</Option>
-                            <Option value="in_progress">进行中</Option>
-                            <Option value="completed">已完成</Option>
+                            <Option value="pending">{t("待处理")}</Option>
+                            <Option value="in_progress">{t("进行中")}</Option>
+                            <Option value="completed">{t("已完成")}</Option>
                         </Select>
                     </Form.Item>
                     <Form.Item>
                         <Button type="primary" htmlType="submit" style={{ marginRight: 8 }}>
-                            确定
+                            {t("确定")}
                         </Button>
                         <Button onClick={() => setIsEditModalVisible(false)}>
-                            取消
+                            {t("取消")}
                         </Button>
                     </Form.Item>
                 </Form>

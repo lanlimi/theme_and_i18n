@@ -12,13 +12,7 @@ import { useTranslation } from "@/i18n/index.ts";
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-const items: MenuItem[] = [
-    { key: '1', icon: <PieChartOutlined />, label: '主页' },
-    { key: '2', icon: <DesktopOutlined />, label: '日程管理' },
-    { key: '3', icon: <ContainerOutlined />, label: '日程订阅' },
-    // { key: '4', icon: <ContainerOutlined />, label: '个性化配置' },
-    { key: '5', icon: <ContainerOutlined />, label: '设置' },
-];
+
 
 const Home = () => {
     const { styles } = useStyles();
@@ -29,6 +23,14 @@ const Home = () => {
     const toggleCollapsed = () => {
         setCollapsed(!collapsed);
     };
+
+    const items: MenuItem[] = [
+        { key: '1', icon: <PieChartOutlined />, label: t('主页') },
+        { key: '2', icon: <DesktopOutlined />, label: t('日程管理') },
+        { key: '3', icon: <ContainerOutlined />, label: t('日程订阅') },
+        // { key: '4', icon: <ContainerOutlined />, label: '个性化配置' },
+        { key: '5', icon: <ContainerOutlined />, label: t('设置') },
+    ];
 
     return (
         <div className={styles.root}>

@@ -596,4 +596,18 @@ export default customCreateStyles(({ token, css }) => ({
             height: 0;
         }
     `,
+
+    modalTextStyle: css`
+        color: ${token.colorText};
+        font-size: ${token.fontSizeLG}px;
+        margin-bottom: 4px;
+        font-weight: 600;
+    `,
+
+    infoTextStyle: css`
+        color: ${token.colorTextTertiary};
+        font-size: ${token.fontSizeBase}px;
+        font-weight: 400;
+        background: rgba(0,0,0,0.02);
+    `
 }))

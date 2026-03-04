@@ -95,12 +95,12 @@ export const getWeekdayNames = () => {
     // i18n.t('calendar.thursday'),
     // i18n.t('calendar.friday'),
     // i18n.t('calendar.saturday')
-    '周日',
     '周一',
     '周二',
     '周三',
     '周四',
     '周五',
-    '周六'
+    '周六',
+    '周日',
   ];
 };
