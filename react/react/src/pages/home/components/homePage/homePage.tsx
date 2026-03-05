@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Avatar, Modal, Form, Input, Select, DatePicker, Button, message, Empty, Segmented, ConfigProvider } from 'antd';
+import { Avatar, Modal, Form, Input, Select, DatePicker, Button, message, Empty, Segmented, ConfigProvider, Dropdown, type MenuProps } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import { PlusOutlined, LeftOutlined, RightOutlined, CalendarOutlined, ClockCircleOutlined, SunOutlined, MoonOutlined } from '@ant-design/icons';
 import { getMonthData, getWeekdayNames, getWeekData } from '@/utils/DateUtils';
@@ -12,6 +12,7 @@ import appStore from '@/stores/appStore';
 import themeStore from '@/stores/theme';
 import { toJS } from 'mobx';
 import { useTranslation } from '@/i18n';
+import loadLanguageAsync from '@/locales/locales';
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -243,6 +244,13 @@ const HomePage: React.FC<HomePageProps> = ({
     themeStore.setTheme('dark');
   };
 
+
+  const handleSelectChange = (value: string) => {
+    console.log(`selected ${value}`);
+    localStorage.setItem('i18n_Language', value);
+    loadLanguageAsync(value);
+  };
+
   return (
     <ConfigProvider locale={zhCN}>
       <div className={styles.LayoutStyle}>
@@ -285,6 +293,15 @@ const HomePage: React.FC<HomePageProps> = ({
               }
               // setThemeMode(value);
             }}
+          />
+          <Select
+            defaultValue={localStorage.getItem('i18n_Language') || '中文'}
+            style={{ width: 120 }}
+            onChange={handleSelectChange}
+            options={[
+              { value: 'zh-CN', label: '中文' },
+              { value: 'en-US', label: 'English' },
+            ]}
           />
         </div>
       </div>

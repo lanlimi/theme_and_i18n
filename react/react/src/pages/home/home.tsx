@@ -1,6 +1,6 @@
 import HomePage from "./components/homePage/homePage";
 import useStyles from "./style/index";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ContainerOutlined, DesktopOutlined, PieChartOutlined, UploadOutlined, UserOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import { Flex, Layout, Menu, Segmented, theme, type MenuProps } from 'antd';
 import Sider from 'antd/es/layout/Sider';
@@ -9,6 +9,7 @@ import ScheduleManage from "./components/schedule/Schedule.tsx";
 import ScheduleSubscribe from "./components/subscribe/scheduleSubscribe.tsx"
 import Setting from "./components/setting/setting.tsx";
 import { useTranslation } from "@/i18n/index.ts";
+import { useLocation, useNavigate } from "react-router-dom";
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -23,6 +24,23 @@ const Home = () => {
     const toggleCollapsed = () => {
         setCollapsed(!collapsed);
     };
+
+    // 路由守卫，检查是否需要认证
+    const navigate = useNavigate();
+    console.log('当前路由', navigate)
+    const location = useLocation();
+    useEffect(() => {
+        // 不需要认证的页面
+        const publicPaths = ['/login'];
+        
+        // 检查是否需要认证
+        if (!publicPaths.includes(location.pathname)) {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/login', { replace: true });
+            }
+        }
+    }, [location.pathname, navigate]);
 
     const items: MenuItem[] = [
         { key: '1', icon: <PieChartOutlined />, label: t('主页') },

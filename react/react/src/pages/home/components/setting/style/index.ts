@@ -33,6 +33,11 @@ export default customCreateStyles(({ token, css }) => ({
         overflow: hidden;
     `,
     
+    icon: css`
+        font-size: 20px;
+        color: #fff;
+    `,
+    
     cardHeader: css`
         padding: 16px 24px;
         border-bottom: 1px solid ${token.colorBorder};

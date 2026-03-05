@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import './App.css'
-import { Route, Routes, Navigate, BrowserRouter, useLocation } from "react-router-dom";
+import { Route, Routes, Navigate, BrowserRouter, useLocation, useNavigate } from "react-router-dom";
 import { I18nextProvider } from 'react-i18next';
 import { ThemeProvider } from 'antd-style';
 import { ConfigProvider, message } from 'antd';
@@ -28,15 +28,15 @@ function App() {
   const Login = lazy(() => import('@/pages/login/login.tsx'))
 
 
-  const location  = window.location.href.split('?')
+  const currentLocation  = window.location.href.split('?')
   const language: any = localStorage.getItem('i18n_Language');
 
   useEffect(() => {
     if (language) {
       loadLanguageAsync(language);
     }
-    else if (location && location[1].includes('locale')) {
-      const debuggerLan = location[1].split('=')[1]
+    else if (currentLocation && currentLocation[1]?.includes('locale')) {
+      const debuggerLan = currentLocation[1].split('=')[1]
       loadLanguageAsync(debuggerLan);
     }
     else {
@@ -44,9 +44,12 @@ function App() {
       loadLanguageAsync(browserLanguage);
     }
     
-    console.log('url参数', location)
+    console.log('url参数', currentLocation)
     console.log('浏览器语言', language)
   }, []);
+
+
+
 
 
 

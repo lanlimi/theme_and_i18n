@@ -129,3 +129,23 @@ def change_password(user_id):
     user.set_password(new_password)
     db.session.commit()
     return jsonify({'message': 'Password changed successfully'}), 200
+
+@auth_bp.route('/logout', methods=['POST'])
+@token_required
+def logout(user_id):
+    user = User.query.filter_by(id=user_id).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    print(f"[DEBUG] 用户退出登录 - 用户ID: {user_id}, 用户名: {user.username}")
+    
+    # 在实际应用中，可以在这里做一些清理工作，例如：
+    # 1. 将 token 加入黑名单（需要实现 token 黑名单机制）
+    # 2. 记录退出日志
+    # 3. 清理用户的临时数据
+    # 4. 更新用户的最后活跃时间
+    
+    # 由于 JWT 是无状态的，后端无法直接使 token 失效
+    # 主要的安全措施由前端负责（清除本地存储的 token）
+    
+    return jsonify({'message': 'Logout successful'}), 200

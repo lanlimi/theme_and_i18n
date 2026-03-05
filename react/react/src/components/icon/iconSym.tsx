@@ -2,6 +2,6 @@
 import { createFromIconfontCN } from '@ant-design/icons';
 
 const IconSym = createFromIconfontCN({
-    scriptUrl: '//at.alicdn.com/t/c/font_5084590_oshrvmfoeyn.js',
+    scriptUrl: '//at.alicdn.com/t/c/font_5084590_b054dpylp1l.js',
 });
 export default IconSym

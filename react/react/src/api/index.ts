@@ -71,6 +71,10 @@ export const authApi = {
   
   changePassword: (data: { old_password: string; new_password: string }) =>
     request.post<{ message: string }>('/auth/change-password', data),
+
+  // 退出登录
+  logout: () =>
+    request.post<{ message: string }>('/auth/logout'),
 };
 
 export const scheduleApi = {

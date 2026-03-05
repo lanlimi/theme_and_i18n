@@ -6,6 +6,8 @@ import { authApi, type User } from '@/api';
 import type { UploadFile, UploadProps } from 'antd/es/upload';
 import userInfoStore from "@/stores/userInfo.ts";
 import { useTranslation } from "@/i18n/index.ts";
+import Icon from "@/components/icon/icon.tsx";
+import IconSym from "@/components/icon/iconSym.tsx";
 
 const { TextArea } = Input;
 
@@ -91,6 +93,41 @@ const Setting: React.FC = () => {
             return Upload.LIST_IGNORE;
         }
         return true;
+    };
+
+    // 退出登录
+    const handleLogout = async () => {
+        try {
+            await authApi.logout();
+            message.success(t('退出登录成功'));
+            // 清空用户信息
+            userInfoStore.setUserInfo({
+                id: '',
+                name: '',
+                avatar: '',
+                email: '',
+                phone: '',
+                role: ''
+            });
+            // 清除本地存储中的用户相关数据
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            localStorage.removeItem('i18n_Language');
+            localStorage.removeItem('themeType');
+            // 清除会话存储中的数据
+            sessionStorage.clear();
+            // 清除所有 cookies
+            const cookies = document.cookie.split(';');
+            cookies.forEach(cookie => {
+                const eqPos = cookie.indexOf('=');
+                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+            });
+            // 跳转到登录页
+            window.location.href = '/login';
+        } catch (error: any) {
+            message.error(error.response?.data?.error || t('退出登录失败'));
+        }
     };
 
     // 自定义上传头像
@@ -313,9 +350,17 @@ const Setting: React.FC = () => {
                                 )}
                                 <Button 
                                     icon={<LockOutlined />}
+                                    color="cyan" variant="solid"
                                     onClick={() => setPasswordModalVisible(true)}
                                 >
                                     {t("修改密码")}
+                                </Button>
+                                <Button 
+                                    color="danger" variant="solid"
+                                    onClick={handleLogout}
+                                >
+                                    <Icon type='icon-tuichu' className={styles.icon}/>
+                                    {t("退出登录")}
                                 </Button>
                             </div>
                         </div>
@@ -378,6 +423,7 @@ const Setting: React.FC = () => {
                         </Button>
                     </Form.Item>
                 </Form>
+                
             </Modal>
             
         </div>

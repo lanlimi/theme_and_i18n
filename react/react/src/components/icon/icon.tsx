@@ -2,7 +2,7 @@
 const Icon = (props: any) => {
     const {style={}, type, className, ...ret} = props
     return (
-        <i style={style}  className={`iconFont ${type} ${className}`} {...ret}></i>
+        <i style={style}  className={`iconfont ${type} ${className}`} {...ret}></i>
     )
 }
 export default Icon
